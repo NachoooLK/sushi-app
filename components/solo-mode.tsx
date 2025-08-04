@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
-import { doc, updateDoc, increment, getDoc, setDoc } from "firebase/firestore"
+import { doc, updateDoc, increment, getDoc, setDoc, addDoc, collection, serverTimestamp } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -46,6 +46,24 @@ export default function SoloMode() {
             wins: 1
           })
         }
+
+        // Guardar la partida en la colección games para el historial global
+        const gameResult = {
+          roomId: 'solo',
+          roomName: 'Modo Solitario',
+          winner: user.uid,
+          winnerName: user.displayName || user.email || 'Jugador',
+          totalSushi: sushiCount,
+          players: [{
+            id: user.uid,
+            name: user.displayName || user.email || 'Jugador',
+            sushiCount: sushiCount
+          }],
+          finishedAt: serverTimestamp(),
+          date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+        }
+
+        await addDoc(collection(db, 'games'), gameResult)
 
         setGameHistory(prev => [...prev, sushiCount])
         toast({

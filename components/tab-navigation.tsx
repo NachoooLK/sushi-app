@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Users, Trophy, Calendar, Target } from "lucide-react"
+import { Users, Trophy, Calendar, Target, Heart } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 
 interface TabNavigationProps {
@@ -31,6 +31,12 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
       label: "Historial",
       icon: Calendar,
       description: "Partidas anteriores"
+    },
+    {
+      id: "credits",
+      label: "Créditos",
+      icon: Heart,
+      description: "Información del desarrollador"
     }
   ]
 

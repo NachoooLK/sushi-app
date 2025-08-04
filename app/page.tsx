@@ -5,6 +5,7 @@ import { onAuthStateChanged, type User } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import LoginForm from "@/components/login-form"
 import Dashboard from "@/components/dashboard"
+import Credits from "@/components/credits"
 
 import { Loader2 } from "lucide-react"
 
@@ -72,6 +73,9 @@ export default function Home() {
             </div>
           )}
           <LoginForm />
+          <div className="mt-8 max-w-md w-full">
+            <Credits />
+          </div>
         </div>
       )}
     </div>

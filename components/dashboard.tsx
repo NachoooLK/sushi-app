@@ -23,6 +23,7 @@ import { auth } from "@/lib/firebase"
 import { LogOut } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import AdminPanel from "@/components/admin-panel"
+import Credits from "@/components/credits"
 
 interface UserStats {
   totalSushi: number
@@ -315,6 +316,13 @@ export default function Dashboard({ user }: DashboardProps) {
           <div className="mt-4 space-y-4">
             <GameHistory />
             <AdminPanel userEmail={user.email} />
+          </div>
+        )}
+
+        {/* Contenido de créditos */}
+        {activeTab === "credits" && (
+          <div className="mt-4">
+            <Credits />
           </div>
         )}
       </div>
