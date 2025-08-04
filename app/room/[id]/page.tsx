@@ -180,36 +180,59 @@ export default function RoomPage() {
   const isCreator = room.players.length > 0 && room.players[0].id === user.uid
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-3 md:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-2 md:p-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-4 md:mb-6">
-          <Button variant="ghost" onClick={() => router.push("/")} className="flex items-center gap-2 text-sm md:text-base">
+        {/* Header mejorado */}
+        <div className="flex items-center justify-between mb-3 md:mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => router.push("/")} 
+            className="flex items-center gap-2 text-sm md:text-base hover:bg-orange-100 transition-colors"
+          >
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Volver</span>
           </Button>
-          <Button variant="outline" onClick={leaveRoom} className="text-red-600 bg-transparent text-sm md:text-base">
+          <Button 
+            variant="outline" 
+            onClick={leaveRoom} 
+            className="text-red-600 bg-transparent text-sm md:text-base hover:bg-red-50 border-red-300 hover:border-red-400 transition-all duration-200"
+          >
             Salir de la sala
           </Button>
         </div>
 
-        <div className="grid gap-4 md:gap-6">
-          <Card>
-            <CardHeader>
+        <div className="grid gap-3 md:gap-6">
+          {/* Card de información de sala mejorada */}
+          <Card className="shadow-lg border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-red-50">
+            <CardHeader className="pb-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex-1">
-                  <CardTitle className="text-xl md:text-2xl">{room.name}</CardTitle>
-                  <CardDescription className="flex items-center gap-2 mt-2">
-                    <Users className="h-4 w-4" />
-                    {room.players.length}/6 jugadores
-                  </CardDescription>
-                  {room.location && (
-                    <CardDescription className="flex items-center gap-2 mt-1">
-                      📍 {room.location}
-                    </CardDescription>
-                  )}
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="text-2xl md:text-3xl">🍣</div>
+                    <CardTitle className="text-xl md:text-2xl bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                      {room.name}
+                    </CardTitle>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4 text-orange-500" />
+                      <span className="font-medium">{room.players.length}/6</span>
+                      <span>jugadores</span>
+                    </div>
+                    {room.location && (
+                      <div className="flex items-center gap-1">
+                        <span>📍</span>
+                        <span className="font-medium">{room.location}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <Badge variant="outline" className="text-sm md:text-lg cursor-pointer" onClick={copyRoomId}>
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    variant="outline" 
+                    className="text-sm md:text-base cursor-pointer hover:bg-orange-100 border-orange-300 transition-all duration-200" 
+                    onClick={copyRoomId}
+                  >
                     <Copy className="h-3 w-3 md:h-4 md:w-4 mr-1" />
                     {room.id.slice(0, 8)}...
                   </Badge>
@@ -218,35 +241,50 @@ export default function RoomPage() {
             </CardHeader>
             {room.photo && (
               <CardContent className="pt-0">
-                <div className="relative aspect-video rounded-lg overflow-hidden">
+                <div className="relative aspect-video rounded-lg overflow-hidden shadow-md">
                   <img 
                     src={room.photo} 
                     alt={`Foto de ${room.name}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                     }}
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
               </CardContent>
             )}
           </Card>
 
           {currentPlayer && (
-            <Card className="border-orange-200">
-              <CardHeader>
-                <CardTitle className="text-center text-2xl md:text-3xl">Tu contador</CardTitle>
+            <Card className="border-2 border-orange-200 shadow-lg bg-gradient-to-br from-orange-50 to-red-50">
+              <CardHeader className="text-center pb-3">
+                <CardTitle className="text-2xl md:text-3xl bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                  Tu Contador de Sushi
+                </CardTitle>
+                <CardDescription className="text-sm md:text-base">
+                  ¡Cuenta cada pieza que comes! 🍣
+                </CardDescription>
               </CardHeader>
               <CardContent className="text-center space-y-4 md:space-y-6">
-                <div className="text-6xl md:text-8xl font-bold text-orange-600">{currentPlayer.sushiCount}</div>
-                <div className="text-4xl md:text-6xl">🍣</div>
-                <div className="flex justify-center gap-3 md:gap-4">
+                {/* Contador principal con animación */}
+                <div className="relative">
+                  <div className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent animate-pulse">
+                    {currentPlayer.sushiCount}
+                  </div>
+                  <div className="text-4xl md:text-6xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-20 animate-bounce">
+                    🍣
+                  </div>
+                </div>
+                
+                {/* Botones de control mejorados */}
+                <div className="flex justify-center gap-4 md:gap-6">
                   <Button
                     size="lg"
                     variant="outline"
                     onClick={() => updateSushiCount(-1)}
                     disabled={updating || currentPlayer.sushiCount === 0}
-                    className="h-12 w-12 md:h-16 md:w-16 rounded-full"
+                    className="h-14 w-14 md:h-16 md:w-16 rounded-full border-2 hover:border-orange-300 transition-all duration-200 shadow-md hover:shadow-lg"
                   >
                     <Minus className="h-6 w-6 md:h-8 md:w-8" />
                   </Button>
@@ -254,46 +292,86 @@ export default function RoomPage() {
                     size="lg"
                     onClick={() => updateSushiCount(1)}
                     disabled={updating}
-                    className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-orange-500 hover:bg-orange-600"
+                    className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                   >
-                    <Plus className="h-6 w-6 md:h-8 md:w-8" />
+                    <Plus className="h-6 w-6 md:h-8 md:w-8 text-white" />
                   </Button>
                 </div>
+                
+                {/* Estado de carga */}
+                {updating && (
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                    <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Actualizando...</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5" />
-                Ranking de la sala
+          <Card className="shadow-lg border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-red-50">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                <Trophy className="h-6 w-6 text-yellow-500" />
+                Ranking de la Sala
               </CardTitle>
+              <CardDescription className="text-sm md:text-base">
+                ¡Ve quién está comiendo más sushi! 🍣
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {sortedPlayers.map((player, index) => (
                   <div
                     key={player.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${
-                      player.id === user.uid ? "bg-orange-50 border-orange-200" : ""
+                    className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-md ${
+                      player.id === user.uid 
+                        ? "bg-gradient-to-r from-orange-100 to-red-100 border-orange-300 shadow-md" 
+                        : "bg-white border-gray-200 hover:border-orange-200"
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100">
-                        <span className="font-bold text-sm">#{index + 1}</span>
+                    <div className="flex items-center gap-4">
+                      {/* Posición con medalla */}
+                      <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                        index === 0 ? "bg-yellow-100 border-2 border-yellow-400" :
+                        index === 1 ? "bg-gray-100 border-2 border-gray-400" :
+                        index === 2 ? "bg-orange-100 border-2 border-orange-400" :
+                        "bg-gray-100 border-2 border-gray-300"
+                      }`}>
+                        <span className={`font-bold text-sm ${
+                          index === 0 ? "text-yellow-600" :
+                          index === 1 ? "text-gray-600" :
+                          index === 2 ? "text-orange-600" :
+                          "text-gray-500"
+                        }`}>
+                          {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
+                        </span>
                       </div>
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{player.name}</p>
-                        {player.id === user.uid && <p className="text-sm text-orange-600">Tú</p>}
+                      
+                      {/* Avatar y nombre */}
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-12 w-12 border-2 border-orange-200">
+                          <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold">
+                            {player.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold text-base">{player.name}</p>
+                          {player.id === user.uid && (
+                            <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700 border-orange-300">
+                              Tú
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <Badge variant="secondary" className="text-lg">
-                      🍣 {player.sushiCount}
-                    </Badge>
+                    
+                    {/* Contador de sushi */}
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-lg px-3 py-1 border-orange-300 bg-orange-50 text-orange-700">
+                        🍣 {player.sushiCount.toLocaleString()}
+                      </Badge>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -301,15 +379,23 @@ export default function RoomPage() {
           </Card>
 
           {isCreator && (
-            <Card className="border-green-200">
-              <CardHeader>
-                <CardTitle className="text-green-600">Controles del creador</CardTitle>
-                <CardDescription>Como creador de la sala, puedes terminar el juego</CardDescription>
+            <Card className="border-2 border-green-200 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-green-700 text-xl md:text-2xl">
+                  <Trophy className="h-6 w-6 text-green-600" />
+                  Controles del Creador
+                </CardTitle>
+                <CardDescription className="text-sm md:text-base">
+                  Como creador de la sala, puedes terminar el juego y guardar las estadísticas
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button onClick={finishGame} className="w-full bg-green-600 hover:bg-green-700">
-                  <Trophy className="h-4 w-4 mr-2" />
-                  Terminar juego
+                <Button 
+                  onClick={finishGame} 
+                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
+                  <Trophy className="h-5 w-5 mr-2" />
+                  Terminar Juego y Guardar Estadísticas
                 </Button>
               </CardContent>
             </Card>
