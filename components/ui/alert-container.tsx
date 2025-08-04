@@ -13,7 +13,7 @@ export function AlertContainer() {
             key={alert.id}
             className="pointer-events-auto"
             style={{
-              transform: `translateY(${index * 80}px)`,
+              transform: `translateY(${index * 100}px)`,
             }}
           >
             <AlertNotification
@@ -41,17 +41,37 @@ export function showAlert(alert: Parameters<ReturnType<typeof useAlertNotificati
 }
 
 export function showSuccessAlert(title: string, description?: string) {
-  showAlert({ title, description, type: "success" })
+  showAlert({ 
+    title, 
+    description, 
+    type: "success",
+    duration: 4000
+  })
 }
 
 export function showErrorAlert(title: string, description?: string) {
-  showAlert({ title, description, type: "error" })
+  showAlert({ 
+    title, 
+    description, 
+    type: "error",
+    duration: 6000
+  })
 }
 
 export function showWarningAlert(title: string, description?: string) {
-  showAlert({ title, description, type: "warning" })
+  showAlert({ 
+    title, 
+    description, 
+    type: "warning",
+    duration: 5000
+  })
 }
 
 export function showInfoAlert(title: string, description?: string) {
-  showAlert({ title, description, type: "info" })
+  showAlert({ 
+    title, 
+    description, 
+    type: "info",
+    duration: 4000
+  })
 } 
