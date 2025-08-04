@@ -5,8 +5,7 @@ import { onAuthStateChanged, type User } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import LoginForm from "@/components/login-form"
 import Dashboard from "@/components/dashboard"
-import TestFirebase from "@/components/test-firebase"
-import GoogleAuthTest from "@/components/google-auth-test"
+
 import { Loader2 } from "lucide-react"
 
 export default function Home() {
@@ -73,10 +72,6 @@ export default function Home() {
             </div>
           )}
           <LoginForm />
-          <div className="mt-8 space-y-4">
-            <TestFirebase />
-            <GoogleAuthTest />
-          </div>
         </div>
       )}
     </div>
