@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/theme-provider'
 
 export const metadata: Metadata = {
-  title: 'Sushi Rush',
+  title: '🍣 Sushi Rush',
   description: 'Contador de sushi en tiempo real con amigos',
 }
 
