@@ -117,48 +117,72 @@ export default function SoloMode() {
         </div>
 
         <div className="grid gap-4 md:gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl md:text-2xl text-center">🍣 Modo Solitario</CardTitle>
-              <CardDescription className="text-center text-sm md:text-base">
+          {/* Header Card */}
+          <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
+            <CardHeader className="text-center">
+              <div className="text-6xl md:text-8xl mb-4 animate-pulse">🍣</div>
+              <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                Modo Solitario
+              </CardTitle>
+              <CardDescription className="text-base md:text-lg text-gray-600">
                 ¡Juega solo y ve cuántos sushis puedes comer!
               </CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="border-orange-200">
+          {/* Game Card */}
+          <Card className="border-orange-200 shadow-lg">
             <CardHeader>
-              <CardTitle className="text-center text-2xl md:text-3xl">Tu contador</CardTitle>
+              <CardTitle className="text-center text-xl md:text-2xl text-gray-800">
+                Tu Contador de Sushi
+              </CardTitle>
             </CardHeader>
-            <CardContent className="text-center space-y-4 md:space-y-6">
-              <div className="text-6xl md:text-8xl font-bold text-orange-600">{sushiCount}</div>
-              <div className="text-4xl md:text-6xl">🍣</div>
-              <div className="flex justify-center gap-3 md:gap-4">
+            <CardContent className="text-center space-y-6 md:space-y-8">
+              {/* Sushi Counter Display */}
+              <div className="relative">
+                <div className="text-8xl md:text-9xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                  {sushiCount}
+                </div>
+                <div className="text-5xl md:text-7xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-20">
+                  🍣
+                </div>
+              </div>
+              
+              {/* Control Buttons */}
+              <div className="flex justify-center gap-4 md:gap-6">
                 <Button
                   size="lg"
                   variant="outline"
                   onClick={() => updateSushiCount(-1)}
                   disabled={sushiCount === 0}
-                  className="h-12 w-12 md:h-16 md:w-16 rounded-full"
+                  className="h-14 w-14 md:h-16 md:w-16 rounded-full border-2 hover:border-orange-300 transition-all duration-200"
                 >
                   <Minus className="h-6 w-6 md:h-8 md:w-8" />
                 </Button>
                 <Button
                   size="lg"
                   onClick={() => updateSushiCount(1)}
-                  className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-orange-500 hover:bg-orange-600"
+                  className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg transform hover:scale-105 transition-all duration-200"
                 >
-                  <Plus className="h-6 w-6 md:h-8 md:w-8" />
+                  <Plus className="h-6 w-6 md:h-8 md:w-8 text-white" />
                 </Button>
               </div>
               
+              {/* Game Actions */}
               {isPlaying && (
-                <div className="flex gap-2 justify-center">
-                  <Button onClick={finishGame} className="bg-green-600 hover:bg-green-700">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button 
+                    onClick={finishGame} 
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg transform hover:scale-105 transition-all duration-200"
+                  >
                     <Trophy className="h-4 w-4 mr-2" />
                     Terminar Juego
                   </Button>
-                  <Button variant="outline" onClick={resetGame}>
+                  <Button 
+                    variant="outline" 
+                    onClick={resetGame}
+                    className="border-gray-300 hover:border-gray-400 transition-all duration-200"
+                  >
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reiniciar
                   </Button>
