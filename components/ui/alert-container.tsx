@@ -6,14 +6,14 @@ export function AlertContainer() {
   const { alerts, removeAlert } = useAlertNotifications()
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] pointer-events-none">
+    <div className="fixed top-0 right-0 z-[9999] pointer-events-none p-6">
       <div className="relative">
         {alerts.map((alert, index) => (
           <div
             key={alert.id}
-            className="pointer-events-auto"
+            className="pointer-events-auto mb-4"
             style={{
-              transform: `translateY(${index * 100}px)`,
+              transform: `translateY(${index * 20}px)`,
             }}
           >
             <AlertNotification

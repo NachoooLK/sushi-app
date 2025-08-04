@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AlertCircle, CheckCircle, XCircle, Info, X, Bell, Sparkles } from "lucide-react"
+import { AlertCircle, CheckCircle, XCircle, Info, X, Bell, Sparkles, Star, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -16,32 +16,36 @@ export interface AlertNotificationProps {
 
 const alertStyles = {
   success: {
-    container: "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 text-green-800",
+    container: "bg-white border-l-4 border-l-green-500 shadow-xl",
     icon: CheckCircle,
-    iconColor: "text-green-600",
-    accent: "from-green-400 to-emerald-400",
-    glow: "shadow-green-200"
+    iconColor: "text-green-500",
+    accent: "bg-green-500",
+    badge: "bg-green-100 text-green-700",
+    glow: "shadow-green-100"
   },
   error: {
-    container: "bg-gradient-to-r from-red-50 to-pink-50 border-red-200 text-red-800",
+    container: "bg-white border-l-4 border-l-red-500 shadow-xl",
     icon: XCircle,
-    iconColor: "text-red-600",
-    accent: "from-red-400 to-pink-400",
-    glow: "shadow-red-200"
+    iconColor: "text-red-500",
+    accent: "bg-red-500",
+    badge: "bg-red-100 text-red-700",
+    glow: "shadow-red-100"
   },
   warning: {
-    container: "bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 text-yellow-800",
+    container: "bg-white border-l-4 border-l-yellow-500 shadow-xl",
     icon: AlertCircle,
-    iconColor: "text-yellow-600",
-    accent: "from-yellow-400 to-orange-400",
-    glow: "shadow-yellow-200"
+    iconColor: "text-yellow-500",
+    accent: "bg-yellow-500",
+    badge: "bg-yellow-100 text-yellow-700",
+    glow: "shadow-yellow-100"
   },
   info: {
-    container: "bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200 text-blue-800",
+    container: "bg-white border-l-4 border-l-blue-500 shadow-xl",
     icon: Info,
-    iconColor: "text-blue-600",
-    accent: "from-blue-400 to-cyan-400",
-    glow: "shadow-blue-200"
+    iconColor: "text-blue-500",
+    accent: "bg-blue-500",
+    badge: "bg-blue-100 text-blue-700",
+    glow: "shadow-blue-100"
   }
 }
 
@@ -78,43 +82,60 @@ export function AlertNotification({
   return (
     <div
       className={cn(
-        "fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999]",
-        "max-w-md w-full mx-4",
-        "border-2 rounded-2xl shadow-2xl backdrop-blur-sm",
-        "animate-in slide-in-from-top-4 duration-500",
-        isAnimating && "animate-out slide-out-to-top-4 duration-300",
+        "fixed top-6 right-6 z-[9999]",
+        "w-96 max-w-sm",
+        "rounded-xl border shadow-2xl",
+        "transform transition-all duration-500 ease-out",
+        "animate-in slide-in-from-right-4 duration-500",
+        isAnimating && "animate-out slide-out-to-right-4 duration-300",
         styles.container,
         styles.glow
       )}
     >
-      {/* Header with gradient accent */}
+      {/* Floating badge */}
       <div className={cn(
-        "h-1 bg-gradient-to-r rounded-t-2xl",
+        "absolute -top-2 -left-2 w-8 h-8 rounded-full flex items-center justify-center",
+        "border-2 border-white shadow-lg",
         styles.accent
-      )} />
-      
-      <div className="p-6">
+      )}>
+        <Star className="h-4 w-4 text-white" />
+      </div>
+
+      <div className="p-6 pt-8">
         <div className="flex items-start gap-4">
-          {/* Icon with animated background */}
-          <div className="relative">
+          {/* Icon */}
+          <div className="flex-shrink-0">
             <div className={cn(
-              "absolute inset-0 rounded-full bg-gradient-to-r opacity-20 animate-pulse",
-              styles.accent
-            )} />
-            <div className="relative p-3 rounded-full bg-white/80 backdrop-blur-sm border-2 border-white/50">
+              "w-12 h-12 rounded-full flex items-center justify-center",
+              "bg-gradient-to-br from-gray-50 to-gray-100",
+              "border border-gray-200"
+            )}>
               <Icon className={cn("h-6 w-6", styles.iconColor)} />
             </div>
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-yellow-500" />
-              <h4 className="font-bold text-lg">{title}</h4>
+            <div className="flex items-center gap-2 mb-1">
+              <Zap className="h-4 w-4 text-orange-500" />
+              <h4 className="font-bold text-gray-900 text-base">{title}</h4>
             </div>
             {description && (
-              <p className="text-sm opacity-90 leading-relaxed">{description}</p>
+              <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
             )}
+            
+            {/* Type badge */}
+            <div className="flex items-center gap-2 mt-3">
+              <span className={cn(
+                "px-2 py-1 rounded-full text-xs font-medium",
+                styles.badge
+              )}>
+                {type === 'success' && '✅ Éxito'}
+                {type === 'error' && '❌ Error'}
+                {type === 'warning' && '⚠️ Advertencia'}
+                {type === 'info' && 'ℹ️ Información'}
+              </span>
+            </div>
           </div>
 
           {/* Close button */}
@@ -128,7 +149,7 @@ export function AlertNotification({
                 setTimeout(() => onClose(id), 300)
               }, 300)
             }}
-            className="h-8 w-8 p-0 opacity-70 hover:opacity-100 hover:bg-white/50 rounded-full transition-all duration-200"
+            className="h-8 w-8 p-0 opacity-60 hover:opacity-100 hover:bg-gray-100 rounded-full transition-all duration-200"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -136,10 +157,10 @@ export function AlertNotification({
 
         {/* Progress bar */}
         {duration > 0 && (
-          <div className="mt-4 h-1 bg-white/30 rounded-full overflow-hidden">
+          <div className="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
             <div 
               className={cn(
-                "h-full bg-gradient-to-r rounded-full transition-all duration-100 ease-linear",
+                "h-full rounded-full transition-all duration-100 ease-linear",
                 styles.accent
               )}
               style={{
