@@ -61,8 +61,7 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
             `}
           >
             <Icon className="h-4 w-4" />
-            <span className="hidden sm:inline">{tab.label}</span>
-            <span className="sm:hidden">{tab.label.charAt(0)}</span>
+            <span>{tab.label}</span>
           </Button>
         )
       })}
