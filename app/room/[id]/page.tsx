@@ -321,7 +321,7 @@ export default function RoomPage() {
             ratings={room.ratings || []}
             currentUserId={user.uid}
             currentUserName={user.displayName || user.email || 'Jugador'}
-            onAddRating={addRoomRating}
+            onAddRating={(rating) => addRoomRating(roomId, rating)}
           />
         </div>
       </div>
