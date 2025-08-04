@@ -10,6 +10,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut, Settings, Palette, User, Shield, HelpCircle } from "lucide-react"
@@ -83,9 +86,12 @@ export default function UserProfile({ user }: UserProfileProps) {
         <DropdownMenuSeparator />
         
         {/* Temas */}
-        <div className="px-2 py-1.5">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Temas</p>
-          <div className="space-y-1">
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="cursor-pointer">
+            <Palette className="mr-2 h-4 w-4" />
+            <span>Temas</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
             {themes.map((themeOption) => (
               <DropdownMenuItem
                 key={themeOption.id}
@@ -101,8 +107,8 @@ export default function UserProfile({ user }: UserProfileProps) {
                 {theme === themeOption.id && <Palette className="h-3 w-3" />}
               </DropdownMenuItem>
             ))}
-          </div>
-        </div>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         
         <DropdownMenuSeparator />
         
