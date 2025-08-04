@@ -102,7 +102,23 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const handleSetTheme = (newTheme: Theme) => {
     setTheme(newTheme)
     localStorage.setItem("sushi-counter-theme", newTheme)
+    
+    // Aplicar clases CSS al body para el tema
+    const currentTheme = themes.find(t => t.id === newTheme)
+    if (currentTheme) {
+      document.body.className = document.body.className.replace(/theme-\w+/g, '')
+      document.body.classList.add(`theme-${newTheme}`)
+    }
   }
+
+  // Aplicar tema inicial
+  useEffect(() => {
+    const currentTheme = themes.find(t => t.id === theme)
+    if (currentTheme) {
+      document.body.className = document.body.className.replace(/theme-\w+/g, '')
+      document.body.classList.add(`theme-${theme}`)
+    }
+  }, [theme])
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme, themes }}>

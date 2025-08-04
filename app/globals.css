@@ -120,3 +120,44 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Temas personalizados */
+.theme-sushi {
+  --background: linear-gradient(135deg, #fef3c7, #fed7aa, #fecaca);
+  --primary: linear-gradient(135deg, #f97316, #ef4444);
+  --accent: #f97316;
+  --card: linear-gradient(135deg, #fff7ed, #ffedd5);
+  --text: #ea580c;
+}
+
+.theme-ocean {
+  --background: linear-gradient(135deg, #dbeafe, #e0f2fe, #ccfbf1);
+  --primary: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --accent: #3b82f6;
+  --card: linear-gradient(135deg, #eff6ff, #f0f9ff);
+  --text: #2563eb;
+}
+
+.theme-forest {
+  --background: linear-gradient(135deg, #dcfce7, #d1fae5, #ccfbf1);
+  --primary: linear-gradient(135deg, #22c55e, #10b981);
+  --accent: #22c55e;
+  --card: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  --text: #16a34a;
+}
+
+.theme-sunset {
+  --background: linear-gradient(135deg, #fce7f3, #fed7aa, #fef3c7);
+  --primary: linear-gradient(135deg, #ec4899, #f97316);
+  --accent: #ec4899;
+  --card: linear-gradient(135deg, #fdf2f8, #ffedd5);
+  --text: #db2777;
+}
+
+.theme-purple {
+  --background: linear-gradient(135deg, #f3e8ff, #e0e7ff, #dbeafe);
+  --primary: linear-gradient(135deg, #a855f7, #6366f1);
+  --accent: #a855f7;
+  --card: linear-gradient(135deg, #faf5ff, #f0f9ff);
+  --text: #9333ea;
+}

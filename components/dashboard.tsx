@@ -17,6 +17,7 @@ import { useRooms } from "@/hooks/use-rooms"
 import { useRouter } from "next/navigation"
 import { useTheme } from "@/components/theme-provider"
 import ThemeSelector from "@/components/theme-selector"
+import { useThemeStyles } from "@/hooks/use-theme-styles"
 import TabNavigation from "@/components/tab-navigation"
 import { signOut } from "firebase/auth"
 import { auth } from "@/lib/firebase"
@@ -42,6 +43,8 @@ export default function Dashboard({ user }: DashboardProps) {
   const router = useRouter()
   const { theme, themes } = useTheme()
   const currentTheme = themes.find(t => t.id === theme)
+  const { getThemeClasses } = useThemeStyles()
+  const themeClasses = getThemeClasses()
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -107,7 +110,7 @@ export default function Dashboard({ user }: DashboardProps) {
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentTheme?.colors.background} p-2 md:p-4 transition-all duration-300`}>
+    <div className={`min-h-screen ${themeClasses.background} p-2 md:p-4 transition-all duration-300`}>
       <div className="max-w-6xl mx-auto">
         {/* Header compacto para móvil */}
         <div className="mb-3 md:mb-6">
@@ -115,11 +118,11 @@ export default function Dashboard({ user }: DashboardProps) {
             <div className="flex items-center gap-2 md:gap-4">
               <div className="text-2xl md:text-4xl animate-pulse">🍣</div>
               <div>
-                <h1 className={`text-xl md:text-4xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
+                <h1 className={`text-xl md:text-4xl font-bold ${themeClasses.primary} bg-clip-text text-transparent`}>
                   Sushi Rush
                 </h1>
                 <p className="text-xs md:text-base text-gray-600 mt-1 md:mt-2">
-                  ¡Hola <span className={`font-semibold ${currentTheme?.colors.text}`}>{user.displayName || user.email}</span>! 👋
+                  ¡Hola <span className={`font-semibold ${themeClasses.text}`}>{user.displayName || user.email}</span>! 👋
                 </p>
               </div>
             </div>

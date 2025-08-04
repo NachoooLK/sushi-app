@@ -14,7 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut, Settings, Palette, User, Shield, HelpCircle } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { useTheme } from "@/components/theme-provider"
+import { useTheme, type Theme } from "@/components/theme-provider"
 
 interface UserProfileProps {
   user: User
@@ -40,7 +40,7 @@ export default function UserProfile({ user }: UserProfileProps) {
     }
   }
 
-  const handleThemeChange = (newTheme: string) => {
+  const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme)
     toast({
       title: "Tema cambiado",
