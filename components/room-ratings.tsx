@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Star, MessageSquare, Plus } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { useAlerts } from "@/hooks/use-alerts"
 import type { RoomRating } from "@/hooks/use-rooms"
 
 interface RoomRatingsProps {
@@ -29,6 +29,7 @@ export default function RoomRatings({
   const [rating, setRating] = useState(5)
   const [comment, setComment] = useState("")
   const [loading, setLoading] = useState(false)
+  const { showSuccess, showError } = useAlerts()
 
   const hasUserRated = ratings.some(r => r.playerId === currentUserId)
 
@@ -45,20 +46,19 @@ export default function RoomRatings({
         comment: comment.trim() || undefined
       })
 
-      toast({
-        title: "¡Puntuación agregada!",
-        description: "Tu opinión ha sido registrada",
-      })
+      showSuccess(
+        "¡Puntuación agregada!",
+        "Tu opinión ha sido registrada"
+      )
 
       setShowAddForm(false)
       setRating(5)
       setComment("")
     } catch (error: any) {
-      toast({
-        title: "Error al agregar puntuación",
-        description: error.message,
-        variant: "destructive",
-      })
+      showError(
+        "Error al agregar puntuación",
+        error.message
+      )
     } finally {
       setLoading(false)
     }

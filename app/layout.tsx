@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/theme-provider'
+import { AlertContainer } from '@/components/ui/alert-container'
 
 export const metadata: Metadata = {
   title: 'Sushi Rush',
@@ -24,6 +25,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
           <Toaster />
+          <AlertContainer />
         </ThemeProvider>
         <footer className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-200 p-2 text-center z-50">
                   <p className="text-xs text-gray-500">

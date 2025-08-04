@@ -7,7 +7,7 @@ import type { User } from "firebase/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "@/hooks/use-toast"
+import { useAlerts } from "@/hooks/use-alerts"
 import { useRouter } from "next/navigation"
 import { useRooms } from "@/hooks/use-rooms"
 
@@ -22,6 +22,7 @@ export default function CreateRoom({ user }: CreateRoomProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { createRoom, addPlayerToRoom } = useRooms()
+  const { showSuccess, showError } = useAlerts()
 
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,18 +41,17 @@ export default function CreateRoom({ user }: CreateRoomProps) {
         sushiCount: 0
       })
 
-      toast({
-        title: "¡Sala creada!",
-        description: "Tu sala ha sido creada exitosamente",
-      })
+      showSuccess(
+        "¡Sala creada!",
+        "Tu sala ha sido creada exitosamente"
+      )
 
       router.push(`/room/${roomId}`)
     } catch (error: any) {
-      toast({
-        title: "Error al crear sala",
-        description: error.message,
-        variant: "destructive",
-      })
+      showError(
+        "Error al crear sala",
+        error.message
+      )
     } finally {
       setLoading(false)
     }

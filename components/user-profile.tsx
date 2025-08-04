@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut, Settings, Palette, User, Shield, HelpCircle } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { useAlerts } from "@/hooks/use-alerts"
 import { useTheme, type Theme } from "@/components/theme-provider"
 
 interface UserProfileProps {
@@ -23,29 +23,29 @@ interface UserProfileProps {
 export default function UserProfile({ user }: UserProfileProps) {
   const { theme, setTheme, themes } = useTheme()
   const currentTheme = themes.find(t => t.id === theme)
+  const { showSuccess, showError } = useAlerts()
 
   const handleSignOut = async () => {
     try {
       await signOut(auth)
-      toast({
-        title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente",
-      })
+      showSuccess(
+        "Sesión cerrada",
+        "Has cerrado sesión correctamente"
+      )
     } catch (error: any) {
-      toast({
-        title: "Error al cerrar sesión",
-        description: error.message,
-        variant: "destructive",
-      })
+      showError(
+        "Error al cerrar sesión",
+        error.message
+      )
     }
   }
 
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme)
-    toast({
-      title: "Tema cambiado",
-      description: `Cambiado a tema ${themes.find(t => t.id === newTheme)?.name}`,
-    })
+    showSuccess(
+      "Tema cambiado",
+      `Cambiado a tema ${themes.find(t => t.id === newTheme)?.name}`
+    )
   }
 
   return (
