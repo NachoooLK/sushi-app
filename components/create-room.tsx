@@ -17,6 +17,8 @@ interface CreateRoomProps {
 
 export default function CreateRoom({ user }: CreateRoomProps) {
   const [roomName, setRoomName] = useState("")
+  const [photo, setPhoto] = useState("")
+  const [location, setLocation] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { createRoom, addPlayerToRoom } = useRooms()
@@ -29,7 +31,7 @@ export default function CreateRoom({ user }: CreateRoomProps) {
 
     try {
       // Crear la sala
-      const roomId = await createRoom(roomName)
+      const roomId = await createRoom(roomName, photo || undefined, location || undefined)
       
       // Añadir al usuario como primer jugador
       await addPlayerToRoom(roomId, {
@@ -73,6 +75,40 @@ export default function CreateRoom({ user }: CreateRoomProps) {
           Elige un nombre descriptivo para tu sala
         </p>
       </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="photo" className="text-sm font-medium text-green-700">
+          URL de la foto (opcional)
+        </Label>
+        <Input
+          id="photo"
+          type="url"
+          value={photo}
+          onChange={(e) => setPhoto(e.target.value)}
+          placeholder="https://ejemplo.com/foto.jpg"
+          className="h-12 px-4 border-gray-200 focus:border-green-500 focus:ring-green-500"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          Agrega una foto de tu experiencia de sushi
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="location" className="text-sm font-medium text-green-700">
+          Ubicación (opcional)
+        </Label>
+        <Input
+          id="location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Ej: Restaurante Sushi Bar, Madrid"
+          className="h-12 px-4 border-gray-200 focus:border-green-500 focus:ring-green-500"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          ¿Dónde estás disfrutando el sushi?
+        </p>
+      </div>
+
       <Button 
         type="submit" 
         className="w-full h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105" 

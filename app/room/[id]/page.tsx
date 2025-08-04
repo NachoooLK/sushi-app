@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react"
 import { useRoom } from "@/hooks/use-room"
 import { useRooms } from "@/hooks/use-rooms"
 import { useRankings } from "@/hooks/useRankings"
+import RoomRatings from "@/components/room-ratings"
 
 export default function RoomPage() {
   const params = useParams()
@@ -23,7 +24,7 @@ export default function RoomPage() {
   
   const roomId = params.id as string
   const { room, loading, error } = useRoom(roomId)
-  const { updatePlayerSushiCount, closeRoom, removePlayerFromRoom } = useRooms()
+  const { updatePlayerSushiCount, closeRoom, removePlayerFromRoom, addRoomRating } = useRooms()
   const { finishGame: finishGameWithStats } = useRankings()
 
   useEffect(() => {
@@ -195,12 +196,17 @@ export default function RoomPage() {
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
+                <div className="flex-1">
                   <CardTitle className="text-xl md:text-2xl">{room.name}</CardTitle>
                   <CardDescription className="flex items-center gap-2 mt-2">
                     <Users className="h-4 w-4" />
                     {room.players.length}/6 jugadores
                   </CardDescription>
+                  {room.location && (
+                    <CardDescription className="flex items-center gap-2 mt-1">
+                      📍 {room.location}
+                    </CardDescription>
+                  )}
                 </div>
                 <div className="text-right">
                   <Badge variant="outline" className="text-sm md:text-lg cursor-pointer" onClick={copyRoomId}>
@@ -210,6 +216,20 @@ export default function RoomPage() {
                 </div>
               </div>
             </CardHeader>
+            {room.photo && (
+              <CardContent className="pt-0">
+                <div className="relative aspect-video rounded-lg overflow-hidden">
+                  <img 
+                    src={room.photo} 
+                    alt={`Foto de ${room.name}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                </div>
+              </CardContent>
+            )}
           </Card>
 
           {currentPlayer && (
@@ -294,6 +314,15 @@ export default function RoomPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* Puntuaciones */}
+          <RoomRatings
+            roomId={roomId}
+            ratings={room.ratings || []}
+            currentUserId={user.uid}
+            currentUserName={user.displayName || user.email || 'Jugador'}
+            onAddRating={addRoomRating}
+          />
         </div>
       </div>
     </div>

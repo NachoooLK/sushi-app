@@ -20,6 +20,18 @@ export interface Room {
   createdAt: any
   players: Player[]
   isActive: boolean
+  photo?: string
+  location?: string
+  ratings?: RoomRating[]
+}
+
+export interface RoomRating {
+  id: string
+  playerId: string
+  playerName: string
+  rating: number // 1-5 estrellas
+  comment?: string
+  createdAt: any
 }
 
 export interface Player {
@@ -54,13 +66,16 @@ export const useRooms = () => {
   }, [])
 
   // Crear una nueva sala
-  const createRoom = async (name: string): Promise<string> => {
+  const createRoom = async (name: string, photo?: string, location?: string): Promise<string> => {
     try {
       const roomData = {
         name,
         createdAt: serverTimestamp(),
         players: [],
-        isActive: true
+        isActive: true,
+        photo: photo || null,
+        location: location || null,
+        ratings: []
       }
       
       const docRef = await addDoc(collection(db, 'rooms'), roomData)
@@ -175,6 +190,60 @@ export const useRooms = () => {
     }
   }
 
+  // Agregar puntuación a una sala
+  const addRoomRating = async (roomId: string, rating: Omit<RoomRating, 'id' | 'createdAt'>) => {
+    try {
+      const roomRef = doc(db, 'rooms', roomId)
+      const roomSnap = await getDoc(roomRef)
+      
+      if (!roomSnap.exists()) {
+        throw new Error('Room not found')
+      }
+
+      const roomData = roomSnap.data() as Room
+      const newRating: RoomRating = {
+        id: `${rating.playerId}-${Date.now()}`, // ID único
+        ...rating,
+        createdAt: serverTimestamp()
+      }
+
+      const updatedRatings = [...(roomData.ratings || []), newRating]
+      
+      await updateDoc(roomRef, {
+        ratings: updatedRatings
+      })
+    } catch (error) {
+      console.error('Error adding room rating:', error)
+      throw error
+    }
+  }
+
+  // Actualizar foto de la sala
+  const updateRoomPhoto = async (roomId: string, photoUrl: string) => {
+    try {
+      const roomRef = doc(db, 'rooms', roomId)
+      await updateDoc(roomRef, {
+        photo: photoUrl
+      })
+    } catch (error) {
+      console.error('Error updating room photo:', error)
+      throw error
+    }
+  }
+
+  // Actualizar ubicación de la sala
+  const updateRoomLocation = async (roomId: string, location: string) => {
+    try {
+      const roomRef = doc(db, 'rooms', roomId)
+      await updateDoc(roomRef, {
+        location: location
+      })
+    } catch (error) {
+      console.error('Error updating room location:', error)
+      throw error
+    }
+  }
+
   return {
     rooms,
     loading,
@@ -183,6 +252,9 @@ export const useRooms = () => {
     addPlayerToRoom,
     updatePlayerSushiCount,
     closeRoom,
-    removePlayerFromRoom
+    removePlayerFromRoom,
+    addRoomRating,
+    updateRoomPhoto,
+    updateRoomLocation
   }
 } 
