@@ -22,6 +22,7 @@ import { signOut } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { LogOut } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import AdminPanel from "@/components/admin-panel"
 
 interface UserStats {
   totalSushi: number
@@ -311,8 +312,9 @@ export default function Dashboard({ user }: DashboardProps) {
 
         {/* Contenido de historial */}
         {activeTab === "history" && (
-          <div className="mt-4">
+          <div className="mt-4 space-y-4">
             <GameHistory />
+            <AdminPanel userEmail={user.email} />
           </div>
         )}
       </div>

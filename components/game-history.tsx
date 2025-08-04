@@ -1,12 +1,30 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore"
+import { collection, query, where, orderBy, getDocs, deleteDoc, doc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Trophy, Users, Calendar, Clock, Medal, Star, Crown } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Trophy, Users, Calendar, Clock, Medal, Star, Crown, Trash2, MoreVertical, Eye } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
+import { toast } from "@/hooks/use-toast"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface GameResult {
   id: string
@@ -23,6 +41,8 @@ interface GameResult {
 export default function GameHistory() {
   const [games, setGames] = useState<GameResult[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [gameToDelete, setGameToDelete] = useState<GameResult | null>(null)
   const { theme, themes } = useTheme()
   const currentTheme = themes.find(t => t.id === theme)
 
@@ -61,6 +81,41 @@ export default function GameHistory() {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
+    })
+  }
+
+  const handleDeleteGame = async (game: GameResult) => {
+    setGameToDelete(game)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!gameToDelete) return
+
+    try {
+      await deleteDoc(doc(db, 'games', gameToDelete.id))
+      setGames(games.filter(game => game.id !== gameToDelete.id))
+      toast({
+        title: "Partida eliminada",
+        description: "La partida se ha eliminado del historial",
+      })
+    } catch (error) {
+      console.error('Error deleting game:', error)
+      toast({
+        title: "Error al eliminar",
+        description: "No se pudo eliminar la partida",
+        variant: "destructive",
+      })
+    } finally {
+      setDeleteDialogOpen(false)
+      setGameToDelete(null)
+    }
+  }
+
+  const showGameDetails = (game: GameResult) => {
+    toast({
+      title: `Detalles de ${game.roomName}`,
+      description: `Ganador: ${game.winnerName} | Jugadores: ${game.players.length} | Sushi: ${game.totalSushi} piezas`,
     })
   }
 
@@ -170,6 +225,28 @@ export default function GameHistory() {
                     <div className="text-xs text-gray-400">
                       {game.totalSushi === 1 ? 'pieza' : 'piezas'}
                     </div>
+                    
+                    {/* Action menu */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => showGameDetails(game)}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Ver detalles
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleDeleteGame(game)}
+                          className="text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
                 
@@ -191,5 +268,27 @@ export default function GameHistory() {
         </div>
       </CardContent>
     </Card>
+
+    {/* Delete confirmation dialog */}
+    <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Eliminar partida?</AlertDialogTitle>
+          <AlertDialogDescription>
+            ¿Estás seguro de que quieres eliminar la partida "{gameToDelete?.roomName}"? 
+            Esta acción no se puede deshacer.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={confirmDelete}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            Eliminar
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 } 
