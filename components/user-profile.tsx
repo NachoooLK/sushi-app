@@ -18,6 +18,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut, Settings, Palette, User, Shield, HelpCircle } from "lucide-react"
 import { useAlerts } from "@/hooks/use-alerts"
 import { useTheme, type Theme } from "@/components/theme-provider"
+import { useState } from "react"
+import UserSettings from "./user-settings"
+import PrivacyPolicy from "./privacy-policy"
+import HelpSupport from "./help-support"
 
 interface UserProfileProps {
   user: User
@@ -27,6 +31,9 @@ export default function UserProfile({ user }: UserProfileProps) {
   const { theme, setTheme, themes } = useTheme()
   const currentTheme = themes.find(t => t.id === theme)
   const { showSuccess, showError } = useAlerts()
+  const [showSettings, setShowSettings] = useState(false)
+  const [showPrivacy, setShowPrivacy] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
 
   const handleSignOut = async () => {
     try {
@@ -78,7 +85,7 @@ export default function UserProfile({ user }: UserProfileProps) {
           <span>Mi Perfil</span>
         </DropdownMenuItem>
         
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={() => setShowSettings(true)}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Ajustes</span>
         </DropdownMenuItem>
@@ -113,12 +120,12 @@ export default function UserProfile({ user }: UserProfileProps) {
         <DropdownMenuSeparator />
         
         {/* Ayuda y Soporte */}
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={() => setShowHelp(true)}>
           <HelpCircle className="mr-2 h-4 w-4" />
           <span>Ayuda</span>
         </DropdownMenuItem>
         
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={() => setShowPrivacy(true)}>
           <Shield className="mr-2 h-4 w-4" />
           <span>Privacidad</span>
         </DropdownMenuItem>
@@ -132,5 +139,19 @@ export default function UserProfile({ user }: UserProfileProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    {/* Modales */}
+    {showSettings && (
+      <UserSettings user={user} onClose={() => setShowSettings(false)} />
+    )}
+    
+    {showPrivacy && (
+      <PrivacyPolicy onClose={() => setShowPrivacy(false)} />
+    )}
+    
+    {showHelp && (
+      <HelpSupport onClose={() => setShowHelp(false)} />
+    )}
+  </>
   )
 }
