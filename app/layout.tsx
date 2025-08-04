@@ -6,6 +6,11 @@ import { ThemeProvider } from '@/components/theme-provider'
 export const metadata: Metadata = {
   title: '🍣 Sushi Rush',
   description: 'Contador de sushi en tiempo real con amigos',
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/icon.svg',
+    shortcut: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
