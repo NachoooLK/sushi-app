@@ -12,7 +12,17 @@ const firebaseConfig = {
   measurementId: "G-LDV1WH5LXH"
 };
 
+// Verificar que la configuración esté completa
+if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
+  console.error('Firebase configuration is incomplete');
+}
+
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Verificar que Firebase se inicializó correctamente
+console.log('Firebase initialized with project:', firebaseConfig.projectId);
+console.log('Firebase auth domain:', firebaseConfig.authDomain);
+console.log('Firebase API key:', firebaseConfig.apiKey ? '✅ Present' : '❌ Missing');

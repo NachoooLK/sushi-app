@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useRooms } from '../hooks/useRooms';
+import { useRooms } from '../hooks/use-rooms';
 import { useAuth } from '../hooks/useAuth';
 
 export default function CreateRoomScreen({ navigation }: any) {

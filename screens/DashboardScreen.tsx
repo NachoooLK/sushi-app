@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
-import { useRooms } from '../hooks/useRooms';
+import { useRooms } from '../hooks/use-rooms';
 
 export default function DashboardScreen({ navigation }: any) {
   const { user, logout } = useAuth();

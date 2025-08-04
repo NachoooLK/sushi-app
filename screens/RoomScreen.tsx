@@ -8,7 +8,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { useRooms } from '../hooks/useRooms';
+import { useRooms } from '../hooks/use-rooms';
 import { useAuth } from '../hooks/useAuth';
 import { useRankings } from '../hooks/useRankings';
 

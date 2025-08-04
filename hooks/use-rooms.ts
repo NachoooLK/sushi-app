@@ -26,7 +26,7 @@ export interface Player {
   id: string
   name: string
   sushiCount: number
-  joinedAt: any
+  joinedAt: Date
 }
 
 export const useRooms = () => {
@@ -100,7 +100,7 @@ export const useRooms = () => {
       const roomData = roomSnap.data() as Room
       const newPlayer: Player = {
         ...player,
-        joinedAt: serverTimestamp()
+        joinedAt: new Date() // Usar Date() en lugar de serverTimestamp()
       }
 
       const updatedPlayers = [...roomData.players, newPlayer]
@@ -153,6 +153,28 @@ export const useRooms = () => {
     }
   }
 
+  // Remover un jugador de una sala
+  const removePlayerFromRoom = async (roomId: string, playerId: string) => {
+    try {
+      const roomRef = doc(db, 'rooms', roomId)
+      const roomSnap = await getDoc(roomRef)
+      
+      if (!roomSnap.exists()) {
+        throw new Error('Room not found')
+      }
+
+      const roomData = roomSnap.data() as Room
+      const updatedPlayers = roomData.players.filter(player => player.id !== playerId)
+      
+      await updateDoc(roomRef, {
+        players: updatedPlayers
+      })
+    } catch (error) {
+      console.error('Error removing player from room:', error)
+      throw error
+    }
+  }
+
   return {
     rooms,
     loading,
@@ -160,6 +182,7 @@ export const useRooms = () => {
     getRoom,
     addPlayerToRoom,
     updatePlayerSushiCount,
-    closeRoom
+    closeRoom,
+    removePlayerFromRoom
   }
 } 

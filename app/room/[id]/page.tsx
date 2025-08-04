@@ -13,6 +13,7 @@ import { ArrowLeft, Plus, Minus, Trophy, Users, Copy } from "lucide-react"
 import { Loader2 } from "lucide-react"
 import { useRoom } from "@/hooks/use-room"
 import { useRooms } from "@/hooks/use-rooms"
+import { useRankings } from "@/hooks/useRankings"
 
 export default function RoomPage() {
   const params = useParams()
@@ -22,7 +23,8 @@ export default function RoomPage() {
   
   const roomId = params.id as string
   const { room, loading, error } = useRoom(roomId)
-  const { updatePlayerSushiCount, closeRoom } = useRooms()
+  const { updatePlayerSushiCount, closeRoom, removePlayerFromRoom } = useRooms()
+  const { finishGame: finishGameWithStats } = useRankings()
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -34,6 +36,24 @@ export default function RoomPage() {
 
     return () => unsubscribeAuth()
   }, [router])
+
+  // Agregar automáticamente al jugador a la sala si no está presente
+  useEffect(() => {
+    if (room && user && !room.players.find(p => p.id === user.uid)) {
+      const addPlayer = async () => {
+        try {
+          await addPlayerToRoom(roomId, {
+            id: user.uid,
+            name: user.displayName || user.email || 'Jugador',
+            sushiCount: 0
+          })
+        } catch (error) {
+          console.error('Error adding player to room:', error)
+        }
+      }
+      addPlayer()
+    }
+  }, [room, user, roomId])
 
   useEffect(() => {
     if (error) {
@@ -71,21 +91,25 @@ export default function RoomPage() {
     if (!room || !user) return
 
     try {
-      // Encontrar el ganador
+      // Guardar estadísticas del juego
+      await finishGameWithStats(room)
+      
+      // Cerrar la sala
+      await closeRoom(roomId)
+
+      // Encontrar el ganador para el mensaje
       const winner = room.players.reduce((prev, current) => 
         (prev.sushiCount > current.sushiCount ? prev : current)
       )
 
-      // Cerrar la sala
-      await closeRoom(roomId)
-
       toast({
         title: "¡Juego terminado!",
-        description: `${winner.name} ganó con ${winner.sushiCount} piezas de sushi`,
+        description: `${winner.name} ganó con ${winner.sushiCount} piezas de sushi. Estadísticas actualizadas.`,
       })
 
       router.push("/")
     } catch (error: any) {
+      console.error('Error finishing game:', error)
       toast({
         title: "Error al terminar juego",
         description: error.message,
@@ -98,15 +122,33 @@ export default function RoomPage() {
     if (!room || !user) return
 
     try {
-      // Por ahora simplemente redirigimos, en el futuro podríamos implementar
-      // la lógica para remover al jugador de la sala
+      // Remover al jugador de la sala
+      await removePlayerFromRoom(roomId, user.uid)
+      
+      // Si es el último jugador, cerrar la sala
+      if (room.players.length <= 1) {
+        await closeRoom(roomId)
+        toast({
+          title: "Sala cerrada",
+          description: "Eras el último jugador, la sala ha sido cerrada",
+        })
+      } else {
+        toast({
+          title: "Has salido de la sala",
+          description: "Te has removido exitosamente de la sala",
+        })
+      }
+      
       router.push("/")
     } catch (error: any) {
+      console.error('Error leaving room:', error)
       toast({
         title: "Error al salir de la sala",
         description: error.message,
         variant: "destructive",
       })
+      // Aún redirigimos aunque haya error
+      router.push("/")
     }
   }
 
@@ -137,32 +179,32 @@ export default function RoomPage() {
   const isCreator = room.players.length > 0 && room.players[0].id === user.uid
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-3 md:p-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <Button variant="ghost" onClick={() => router.push("/")} className="flex items-center gap-2">
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <Button variant="ghost" onClick={() => router.push("/")} className="flex items-center gap-2 text-sm md:text-base">
             <ArrowLeft className="h-4 w-4" />
-            Volver
+            <span className="hidden sm:inline">Volver</span>
           </Button>
-          <Button variant="outline" onClick={leaveRoom} className="text-red-600 bg-transparent">
+          <Button variant="outline" onClick={leaveRoom} className="text-red-600 bg-transparent text-sm md:text-base">
             Salir de la sala
           </Button>
         </div>
 
-        <div className="grid gap-6">
+        <div className="grid gap-4 md:gap-6">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-2xl">{room.name}</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl">{room.name}</CardTitle>
                   <CardDescription className="flex items-center gap-2 mt-2">
                     <Users className="h-4 w-4" />
                     {room.players.length}/6 jugadores
                   </CardDescription>
                 </div>
                 <div className="text-right">
-                  <Badge variant="outline" className="text-lg cursor-pointer" onClick={copyRoomId}>
-                    <Copy className="h-4 w-4 mr-1" />
+                  <Badge variant="outline" className="text-sm md:text-lg cursor-pointer" onClick={copyRoomId}>
+                    <Copy className="h-3 w-3 md:h-4 md:w-4 mr-1" />
                     {room.id.slice(0, 8)}...
                   </Badge>
                 </div>
@@ -173,28 +215,28 @@ export default function RoomPage() {
           {currentPlayer && (
             <Card className="border-orange-200">
               <CardHeader>
-                <CardTitle className="text-center text-3xl">Tu contador</CardTitle>
+                <CardTitle className="text-center text-2xl md:text-3xl">Tu contador</CardTitle>
               </CardHeader>
-              <CardContent className="text-center space-y-6">
-                <div className="text-8xl font-bold text-orange-600">{currentPlayer.sushiCount}</div>
-                <div className="text-6xl">🍣</div>
-                <div className="flex justify-center gap-4">
+              <CardContent className="text-center space-y-4 md:space-y-6">
+                <div className="text-6xl md:text-8xl font-bold text-orange-600">{currentPlayer.sushiCount}</div>
+                <div className="text-4xl md:text-6xl">🍣</div>
+                <div className="flex justify-center gap-3 md:gap-4">
                   <Button
                     size="lg"
                     variant="outline"
                     onClick={() => updateSushiCount(-1)}
                     disabled={updating || currentPlayer.sushiCount === 0}
-                    className="h-16 w-16 rounded-full"
+                    className="h-12 w-12 md:h-16 md:w-16 rounded-full"
                   >
-                    <Minus className="h-8 w-8" />
+                    <Minus className="h-6 w-6 md:h-8 md:w-8" />
                   </Button>
                   <Button
                     size="lg"
                     onClick={() => updateSushiCount(1)}
                     disabled={updating}
-                    className="h-16 w-16 rounded-full bg-orange-500 hover:bg-orange-600"
+                    className="h-12 w-12 md:h-16 md:w-16 rounded-full bg-orange-500 hover:bg-orange-600"
                   >
-                    <Plus className="h-8 w-8" />
+                    <Plus className="h-6 w-6 md:h-8 md:w-8" />
                   </Button>
                 </div>
               </CardContent>

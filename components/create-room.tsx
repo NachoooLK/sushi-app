@@ -58,17 +58,34 @@ export default function CreateRoom({ user }: CreateRoomProps) {
   return (
     <form onSubmit={handleCreateRoom} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="roomName">Nombre de la sala</Label>
+        <Label htmlFor="roomName" className="text-sm font-medium text-green-700">
+          Nombre de la sala
+        </Label>
         <Input
           id="roomName"
           value={roomName}
           onChange={(e) => setRoomName(e.target.value)}
           placeholder="Ej: Cena de sushi con amigos"
           required
+          className="h-12 px-4 border-gray-200 focus:border-green-500 focus:ring-green-500"
         />
+        <p className="text-xs text-gray-500 mt-1">
+          Elige un nombre descriptivo para tu sala
+        </p>
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Creando..." : "Crear Sala"}
+      <Button 
+        type="submit" 
+        className="w-full h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105" 
+        disabled={loading}
+      >
+        {loading ? (
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <span>Creando sala...</span>
+          </div>
+        ) : (
+          "Crear Sala"
+        )}
       </Button>
     </form>
   )

@@ -94,17 +94,34 @@ export default function JoinRoom({ user }: JoinRoomProps) {
   return (
     <form onSubmit={handleJoinRoom} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="roomId">ID de la sala</Label>
+        <Label htmlFor="roomId" className="text-sm font-medium text-purple-700">
+          ID de la sala
+        </Label>
         <Input
           id="roomId"
           value={roomId}
           onChange={(e) => setRoomId(e.target.value)}
           placeholder="Pega el ID de la sala aquí"
           required
+          className="h-12 px-4 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
         />
+        <p className="text-xs text-gray-500 mt-1">
+          Pega el código que te compartió tu amigo
+        </p>
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Uniéndose..." : "Unirse a Sala"}
+      <Button 
+        type="submit" 
+        className="w-full h-12 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105" 
+        disabled={loading}
+      >
+        {loading ? (
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <span>Uniéndose...</span>
+          </div>
+        ) : (
+          "Unirse a Sala"
+        )}
       </Button>
     </form>
   )
