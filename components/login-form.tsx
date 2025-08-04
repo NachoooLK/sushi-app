@@ -210,7 +210,7 @@ export default function LoginForm() {
         <CardHeader className="text-center pb-4 md:pb-6">
           <div className="text-6xl md:text-8xl mb-4 md:mb-6 animate-bounce">🍣</div>
           <CardTitle className={`text-2xl md:text-3xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
-            Sushi Counter
+            Sushi Rush
           </CardTitle>
           <CardDescription className="text-base md:text-lg text-gray-600 mt-2">
             ¡Compite con tus amigos contando sushi en tiempo real!

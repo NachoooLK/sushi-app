@@ -82,7 +82,7 @@ export default function Credits() {
           {/* Version */}
           <div className="text-center pt-2">
             <p className="text-xs text-gray-500">
-              Sushi Counter v1.0.0
+              Sushi Rush v1.0.0
             </p>
             <p className="text-xs text-gray-400 mt-1">
               Made by NachoLK

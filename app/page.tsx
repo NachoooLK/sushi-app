@@ -48,7 +48,7 @@ export default function Home() {
         <div className="text-center">
           <div className="text-8xl mb-6 animate-bounce">🍣</div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4">
-            Sushi Counter
+            Sushi Rush
           </h1>
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>

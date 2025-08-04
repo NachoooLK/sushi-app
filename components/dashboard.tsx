@@ -116,7 +116,7 @@ export default function Dashboard({ user }: DashboardProps) {
               <div className="text-2xl md:text-3xl animate-pulse">🍣</div>
               <div>
                 <h1 className={`text-xl md:text-3xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
-                  Sushi Counter
+                  Sushi Rush
                 </h1>
                 <p className="text-xs md:text-sm text-gray-600 mt-1">
                   ¡Hola <span className={`font-semibold ${currentTheme?.colors.text}`}>{user.displayName || user.email}</span>! 👋
