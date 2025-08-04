@@ -16,13 +16,8 @@ import { Trophy, Users, Plus, Search, Clock, Copy, Target, Calendar } from "luci
 import { useRooms } from "@/hooks/use-rooms"
 import { useRouter } from "next/navigation"
 import { useTheme } from "@/components/theme-provider"
-import ThemeSelector from "@/components/theme-selector"
 import { useThemeStyles } from "@/hooks/use-theme-styles"
 import TabNavigation from "@/components/tab-navigation"
-import { signOut } from "firebase/auth"
-import { auth } from "@/lib/firebase"
-import { LogOut } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
 import AdminPanel from "@/components/admin-panel"
 import Credits from "@/components/credits"
 
@@ -93,21 +88,7 @@ export default function Dashboard({ user }: DashboardProps) {
     router.push(`/room/${roomId}`)
   }
 
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth)
-      toast({
-        title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente",
-      })
-    } catch (error: any) {
-      toast({
-        title: "Error al cerrar sesión",
-        description: error.message,
-        variant: "destructive",
-      })
-    }
-  }
+
 
   return (
     <div className={`min-h-screen ${themeClasses.background} p-2 md:p-4 transition-all duration-300`}>
@@ -127,17 +108,7 @@ export default function Dashboard({ user }: DashboardProps) {
               </div>
             </div>
             <div className="flex items-center gap-2 md:gap-4">
-              <ThemeSelector />
               <UserProfile user={user} />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Cerrar sesión</span>
-              </Button>
             </div>
           </div>
 
