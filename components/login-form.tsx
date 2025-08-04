@@ -206,13 +206,13 @@ export default function LoginForm() {
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-3 md:p-4 bg-gradient-to-br ${currentTheme?.colors.background}`}>
-      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
-        <CardHeader className="text-center pb-4 md:pb-6">
-          <div className="text-6xl md:text-8xl mb-4 md:mb-6 animate-bounce">🍣</div>
-          <CardTitle className={`text-2xl md:text-3xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
+      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/90 backdrop-blur-md">
+        <CardHeader className="text-center pb-6 md:pb-8">
+          <div className="text-7xl md:text-9xl mb-6 md:mb-8 animate-pulse">🍣</div>
+          <CardTitle className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
             Sushi Rush
           </CardTitle>
-          <CardDescription className="text-base md:text-lg text-gray-600 mt-2">
+          <CardDescription className="text-lg md:text-xl text-gray-600 mt-3">
             ¡Compite con tus amigos contando sushi en tiempo real!
           </CardDescription>
         </CardHeader>
@@ -245,7 +245,7 @@ export default function LoginForm() {
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
                     required 
-                    className="h-12 px-4 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                    className="h-14 px-4 border-2 border-gray-200 focus:border-orange-500 focus:ring-orange-500 transition-all duration-200 text-base"
                     placeholder="tu@email.com"
                   />
                 </div>
@@ -259,13 +259,13 @@ export default function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-12 px-4 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                    className="h-14 px-4 border-2 border-gray-200 focus:border-orange-500 focus:ring-orange-500 transition-all duration-200 text-base"
                     placeholder="••••••••"
                   />
                 </div>
                 <Button 
                   type="submit" 
-                  className={`w-full h-12 ${currentTheme?.colors.button} text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105`}
+                  className={`w-full h-14 ${currentTheme?.colors.button} text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg`}
                   disabled={loading}
                 >
                   {loading ? (
@@ -291,7 +291,7 @@ export default function LoginForm() {
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     required
-                    className="h-12 px-4 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                    className="h-14 px-4 border-2 border-gray-200 focus:border-orange-500 focus:ring-orange-500 transition-all duration-200 text-base"
                     placeholder="Tu nombre"
                   />
                 </div>
@@ -305,7 +305,7 @@ export default function LoginForm() {
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
                     required 
-                    className="h-12 px-4 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                    className="h-14 px-4 border-2 border-gray-200 focus:border-orange-500 focus:ring-orange-500 transition-all duration-200 text-base"
                     placeholder="tu@email.com"
                   />
                 </div>
@@ -319,7 +319,7 @@ export default function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-12 px-4 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                    className="h-14 px-4 border-2 border-gray-200 focus:border-orange-500 focus:ring-orange-500 transition-all duration-200 text-base"
                     placeholder="Mínimo 6 caracteres"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -328,7 +328,7 @@ export default function LoginForm() {
                 </div>
                 <Button 
                   type="submit" 
-                  className={`w-full h-12 ${currentTheme?.colors.button} text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105`}
+                  className={`w-full h-14 ${currentTheme?.colors.button} text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg`}
                   disabled={loading}
                 >
                   {loading ? (
@@ -360,7 +360,7 @@ export default function LoginForm() {
               variant="outline" 
               onClick={handleGoogleSignIn}
               disabled={googleLoading}
-              className="w-full h-12 border-gray-300 hover:bg-gray-50 transition-all duration-200"
+              className="w-full h-14 border-2 border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm"
             >
               {googleLoading ? (
                 <div className="flex items-center space-x-2">

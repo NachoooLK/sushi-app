@@ -160,25 +160,25 @@ export default function GameHistory() {
 
   return (
     <>
-      <Card className={`${currentTheme?.colors.card} transition-all duration-300`}>
+      <Card className={`${currentTheme?.colors.card} transition-all duration-300 shadow-lg`}>
         <CardHeader>
-          <CardTitle className={`flex items-center gap-2 ${currentTheme?.colors.text}`}>
-            <Trophy className="h-5 w-5" />
+          <CardTitle className={`flex items-center gap-3 ${currentTheme?.colors.text} text-xl`}>
+            <Trophy className="h-6 w-6" />
             Historial de Partidas ({games.length})
           </CardTitle>
-          <CardDescription>Partidas terminadas recientemente</CardDescription>
+          <CardDescription className="text-base">Partidas terminadas recientemente</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {games.slice(0, 5).map((game, index) => (
               <div
                 key={game.id}
-                className="group relative overflow-hidden border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-300 bg-white/50 backdrop-blur-sm"
+                className="group relative overflow-hidden border-2 border-gray-200 rounded-xl hover:shadow-xl transition-all duration-300 bg-white/70 backdrop-blur-sm hover:border-orange-200"
               >
                 {/* Background gradient effect */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${currentTheme?.colors.primary} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                <div className={`absolute inset-0 bg-gradient-to-r ${currentTheme?.colors.primary} opacity-5 group-hover:opacity-15 transition-opacity duration-300`}></div>
                 
-                <div className="relative p-4">
+                <div className="relative p-5">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">

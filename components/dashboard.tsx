@@ -109,28 +109,28 @@ export default function Dashboard({ user }: DashboardProps) {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme?.colors.background} p-4 transition-all duration-300`}>
       <div className="max-w-6xl mx-auto">
-        {/* Header compacto */}
-        <div className="mb-4 md:mb-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="text-2xl md:text-3xl animate-pulse">🍣</div>
+        {/* Header mejorado */}
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="text-3xl md:text-4xl animate-pulse">🍣</div>
               <div>
-                <h1 className={`text-xl md:text-3xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
+                <h1 className={`text-2xl md:text-4xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
                   Sushi Rush
                 </h1>
-                <p className="text-xs md:text-sm text-gray-600 mt-1">
+                <p className="text-sm md:text-base text-gray-600 mt-2">
                   ¡Hola <span className={`font-semibold ${currentTheme?.colors.text}`}>{user.displayName || user.email}</span>! 👋
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-3 md:gap-4">
               <ThemeSelector />
               <UserProfile user={user} />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleSignOut}
-                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Cerrar sesión</span>
@@ -138,35 +138,35 @@ export default function Dashboard({ user }: DashboardProps) {
             </div>
           </div>
 
-          {/* Stats Cards compactos */}
-          <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4">
-            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300 p-3`}>
+          {/* Stats Cards mejorados */}
+          <div className="grid grid-cols-3 gap-3 md:gap-6 mb-6">
+            <Card className={`${currentTheme?.colors.card} hover:shadow-xl transition-all duration-300 p-4 border-2 hover:border-orange-200`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className={`text-lg font-bold ${currentTheme?.colors.text}`}>{userStats.totalSushi.toLocaleString()}</div>
-                  <div className="text-xs text-gray-500">Total Sushi</div>
+                  <div className={`text-xl md:text-2xl font-bold ${currentTheme?.colors.text}`}>{userStats.totalSushi.toLocaleString()}</div>
+                  <div className="text-sm text-gray-500 font-medium">Total Sushi</div>
                 </div>
-                <div className="text-2xl">🍣</div>
+                <div className="text-3xl md:text-4xl">🍣</div>
               </div>
             </Card>
 
-            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300 p-3`}>
+            <Card className={`${currentTheme?.colors.card} hover:shadow-xl transition-all duration-300 p-4 border-2 hover:border-blue-200`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className={`text-lg font-bold ${currentTheme?.colors.text}`}>{userStats.gamesPlayed}</div>
-                  <div className="text-xs text-gray-500">Partidas</div>
+                  <div className={`text-xl md:text-2xl font-bold ${currentTheme?.colors.text}`}>{userStats.gamesPlayed}</div>
+                  <div className="text-sm text-gray-500 font-medium">Partidas</div>
                 </div>
-                <Users className={`h-4 w-4 ${currentTheme?.colors.text}`} />
+                <Users className={`h-5 w-5 md:h-6 md:w-6 ${currentTheme?.colors.text}`} />
               </div>
             </Card>
 
-            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300 p-3`}>
+            <Card className={`${currentTheme?.colors.card} hover:shadow-xl transition-all duration-300 p-4 border-2 hover:border-yellow-200`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className={`text-lg font-bold ${currentTheme?.colors.text}`}>{userStats.wins}</div>
-                  <div className="text-xs text-gray-500">Victorias</div>
+                  <div className={`text-xl md:text-2xl font-bold ${currentTheme?.colors.text}`}>{userStats.wins}</div>
+                  <div className="text-sm text-gray-500 font-medium">Victorias</div>
                 </div>
-                <Trophy className={`h-4 w-4 ${currentTheme?.colors.text}`} />
+                <Trophy className={`h-5 w-5 md:h-6 md:w-6 ${currentTheme?.colors.text}`} />
               </div>
             </Card>
           </div>
