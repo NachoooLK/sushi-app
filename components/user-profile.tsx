@@ -42,7 +42,9 @@ export default function UserProfile({ user }: UserProfileProps) {
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user.photoURL || ""} alt={user.displayName || ""} />
-            <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
+            <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold">
+              {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || "U"}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
