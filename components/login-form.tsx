@@ -73,6 +73,10 @@ export default function LoginForm() {
     
     try {
       const provider = new GoogleAuthProvider()
+      // Agregar scopes adicionales si es necesario
+      provider.addScope('email')
+      provider.addScope('profile')
+      
       const result = await signInWithPopup(auth, provider)
       
       // Crear o actualizar documento de usuario en Firestore
@@ -98,7 +102,15 @@ export default function LoginForm() {
       if (error.code === "auth/popup-closed-by-user") {
         errorMessage = "Inicio de sesión cancelado"
       } else if (error.code === "auth/popup-blocked") {
-        errorMessage = "Popup bloqueado. Permite popups para este sitio"
+        errorMessage = "Popup bloqueado por el navegador. Permite popups para este sitio"
+      } else if (error.code === "auth/unauthorized-domain") {
+        errorMessage = "Dominio no autorizado. Contacta al administrador"
+      } else if (error.code === "auth/operation-not-allowed") {
+        errorMessage = "Google Sign-In no está habilitado. Contacta al administrador"
+      } else if (error.code === "auth/network-request-failed") {
+        errorMessage = "Error de conexión. Verifica tu internet"
+      } else if (error.code === "auth/too-many-requests") {
+        errorMessage = "Demasiados intentos. Intenta más tarde"
       }
 
       toast({
