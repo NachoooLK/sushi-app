@@ -205,18 +205,18 @@ export default function LoginForm() {
   }
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-3 md:p-4 bg-gradient-to-br ${currentTheme?.colors.background}`}>
+    <div className={`min-h-screen flex items-center justify-center p-2 md:p-4 bg-gradient-to-br ${currentTheme?.colors.background}`}>
       <Card className="w-full max-w-md shadow-2xl border-0 bg-white/90 backdrop-blur-md">
-        <CardHeader className="text-center pb-6 md:pb-8">
-          <div className="text-7xl md:text-9xl mb-6 md:mb-8 animate-pulse">🍣</div>
-          <CardTitle className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
+        <CardHeader className="text-center pb-4 md:pb-8">
+          <div className="text-5xl md:text-9xl mb-4 md:mb-8 animate-pulse">🍣</div>
+          <CardTitle className={`text-2xl md:text-4xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
             Sushi Rush
           </CardTitle>
-          <CardDescription className="text-lg md:text-xl text-gray-600 mt-3">
+          <CardDescription className="text-base md:text-xl text-gray-600 mt-2 md:mt-3">
             ¡Compite con tus amigos contando sushi en tiempo real!
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 md:space-y-6">
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-lg">
               <TabsTrigger 

@@ -103,9 +103,9 @@ export default function SoloMode() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-3 md:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-2 md:p-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-4 md:mb-6">
+        <div className="flex items-center justify-between mb-3 md:mb-6">
           <Button variant="ghost" onClick={() => window.history.back()} className="flex items-center gap-2 text-sm md:text-base">
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Volver</span>
@@ -116,7 +116,7 @@ export default function SoloMode() {
           </Badge>
         </div>
 
-        <div className="grid gap-4 md:gap-6">
+        <div className="grid gap-3 md:gap-6">
           {/* Header Card */}
           <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
             <CardHeader className="text-center">
