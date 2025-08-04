@@ -58,7 +58,7 @@ export default function CreateRoom({ user }: CreateRoomProps) {
   }
 
   return (
-    <form onSubmit={handleCreateRoom} className="space-y-4">
+    <form onSubmit={handleCreateRoom} className="space-y-3">
       <div className="space-y-2">
         <Label htmlFor="roomName" className="text-sm font-medium text-green-700">
           Nombre de la sala
@@ -69,16 +69,16 @@ export default function CreateRoom({ user }: CreateRoomProps) {
           onChange={(e) => setRoomName(e.target.value)}
           placeholder="Ej: Cena de sushi con amigos"
           required
-          className="h-12 px-4 border-gray-200 focus:border-green-500 focus:ring-green-500"
+          className="h-10 px-3 border-gray-200 focus:border-green-500 focus:ring-green-500 text-sm"
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500">
           Elige un nombre descriptivo para tu sala
         </p>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="photo" className="text-sm font-medium text-green-700">
-          URL de la foto (opcional)
+          📸 Foto (opcional)
         </Label>
         <Input
           id="photo"
@@ -86,38 +86,38 @@ export default function CreateRoom({ user }: CreateRoomProps) {
           value={photo}
           onChange={(e) => setPhoto(e.target.value)}
           placeholder="https://ejemplo.com/foto.jpg"
-          className="h-12 px-4 border-gray-200 focus:border-green-500 focus:ring-green-500"
+          className="h-10 px-3 border-gray-200 focus:border-green-500 focus:ring-green-500 text-sm"
         />
-        <p className="text-xs text-gray-500 mt-1">
-          Agrega una foto de tu experiencia de sushi
+        <p className="text-xs text-gray-500">
+          Agrega una foto de tu experiencia
         </p>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="location" className="text-sm font-medium text-green-700">
-          Ubicación (opcional)
+          📍 Ubicación (opcional)
         </Label>
         <Input
           id="location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Ej: Restaurante Sushi Bar, Madrid"
-          className="h-12 px-4 border-gray-200 focus:border-green-500 focus:ring-green-500"
+          className="h-10 px-3 border-gray-200 focus:border-green-500 focus:ring-green-500 text-sm"
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500">
           ¿Dónde estás disfrutando el sushi?
         </p>
       </div>
 
       <Button 
         type="submit" 
-        className="w-full h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105" 
+        className="w-full h-10 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 text-sm" 
         disabled={loading}
       >
         {loading ? (
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span>Creando sala...</span>
+            <span>Creando...</span>
           </div>
         ) : (
           "Crear Sala"
