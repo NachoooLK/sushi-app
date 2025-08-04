@@ -1,0 +1,111 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import type { User } from "firebase/auth"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { toast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
+import { useRooms } from "@/hooks/use-rooms"
+
+interface JoinRoomProps {
+  user: User
+}
+
+export default function JoinRoom({ user }: JoinRoomProps) {
+  const [roomId, setRoomId] = useState("")
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const { getRoom, addPlayerToRoom } = useRooms()
+
+  const handleJoinRoom = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!roomId.trim()) return
+
+    setLoading(true)
+
+    try {
+      // Buscar la sala por ID
+      const room = await getRoom(roomId)
+
+      if (!room) {
+        toast({
+          title: "Sala no encontrada",
+          description: "Verifica el ID de la sala",
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (!room.isActive) {
+        toast({
+          title: "Sala cerrada",
+          description: "Esta sala ya no está activa",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Verificar si el usuario ya está en la sala
+      const isAlreadyInRoom = room.players.some((player) => player.id === user.uid)
+
+      if (isAlreadyInRoom) {
+        router.push(`/room/${roomId}`)
+        return
+      }
+
+      // Verificar si la sala está llena (máximo 6 jugadores)
+      if (room.players.length >= 6) {
+        toast({
+          title: "Sala llena",
+          description: "Esta sala ya tiene el máximo de jugadores",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Agregar jugador a la sala
+      await addPlayerToRoom(roomId, {
+        id: user.uid,
+        name: user.displayName || user.email || 'Anónimo',
+        sushiCount: 0
+      })
+
+      toast({
+        title: "¡Te has unido a la sala!",
+        description: `Bienvenido a ${room.name}`,
+      })
+
+      router.push(`/room/${roomId}`)
+    } catch (error: any) {
+      toast({
+        title: "Error al unirse a la sala",
+        description: error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleJoinRoom} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="roomId">ID de la sala</Label>
+        <Input
+          id="roomId"
+          value={roomId}
+          onChange={(e) => setRoomId(e.target.value)}
+          placeholder="Pega el ID de la sala aquí"
+          required
+        />
+      </div>
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Uniéndose..." : "Unirse a Sala"}
+      </Button>
+    </form>
+  )
+}
