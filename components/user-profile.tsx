@@ -3,22 +3,11 @@
 import { type User, signOut } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LogOut, Settings, Palette, User, Shield, HelpCircle } from "lucide-react"
+import { LogOut, Settings, Palette, User, Shield, HelpCircle, ChevronRight, Crown, Bell, Moon, Sun } from "lucide-react"
 import { useAlerts } from "@/hooks/use-alerts"
 import { useTheme, type Theme } from "@/components/theme-provider"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import UserSettings from "./user-settings"
 import PrivacyPolicy from "./privacy-policy"
 import HelpSupport from "./help-support"
@@ -31,9 +20,22 @@ export default function UserProfile({ user }: UserProfileProps) {
   const { theme, setTheme, themes } = useTheme()
   const currentTheme = themes.find(t => t.id === theme)
   const { showSuccess, showError } = useAlerts()
+  const [showDropdown, setShowDropdown] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleSignOut = async () => {
     try {
@@ -58,88 +60,163 @@ export default function UserProfile({ user }: UserProfileProps) {
     )
   }
 
+  const menuItems = [
+    {
+      id: 'profile',
+      label: 'Mi Perfil',
+      icon: User,
+      action: () => console.log('Perfil'),
+      badge: 'Pro'
+    },
+    {
+      id: 'settings',
+      label: 'Ajustes',
+      icon: Settings,
+      action: () => setShowSettings(true)
+    },
+    {
+      id: 'notifications',
+      label: 'Notificaciones',
+      icon: Bell,
+      action: () => console.log('Notificaciones'),
+      badge: '3'
+    },
+    {
+      id: 'help',
+      label: 'Ayuda',
+      icon: HelpCircle,
+      action: () => setShowHelp(true)
+    },
+    {
+      id: 'privacy',
+      label: 'Privacidad',
+      icon: Shield,
+      action: () => setShowPrivacy(true)
+    }
+  ]
+
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-            <Avatar className="h-10 w-10">
+      <div className="relative" ref={dropdownRef}>
+        {/* Avatar Button */}
+        <button
+          onClick={() => setShowDropdown(!showDropdown)}
+          className="relative group"
+        >
+          <div className="relative">
+            <Avatar className="h-12 w-12 ring-2 ring-white shadow-lg transition-all duration-200 group-hover:ring-orange-300 group-hover:scale-105">
               <AvatarImage src={user.photoURL || ""} alt={user.displayName || ""} />
-              <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold">
+              <AvatarFallback className="bg-gradient-to-br from-orange-400 to-red-500 text-white font-bold text-lg">
                 {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-64" align="end" forceMount>
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user.displayName || "Usuario"}</p>
-              <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          
-          {/* Perfil y Configuración */}
-          <DropdownMenuItem className="cursor-pointer">
-            <User className="mr-2 h-4 w-4" />
-            <span>Mi Perfil</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setShowSettings(true)}>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Ajustes</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuSeparator />
-          
-          {/* Temas */}
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="cursor-pointer">
-              <Palette className="mr-2 h-4 w-4" />
-              <span>Temas</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-              {themes.map((themeOption) => (
-                <DropdownMenuItem
-                  key={themeOption.id}
-                  onClick={() => handleThemeChange(themeOption.id)}
-                  className={`cursor-pointer flex items-center justify-between ${
-                    theme === themeOption.id ? 'bg-accent' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${themeOption.colors.primary}`}></div>
-                    <span className="text-sm">{themeOption.name}</span>
+            
+            {/* Status indicator */}
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+          </div>
+        </button>
+
+        {/* Dropdown Menu */}
+        {showDropdown && (
+          <div className="absolute right-0 top-16 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+            
+            {/* Header */}
+            <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 border-b border-gray-100">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-16 w-16 ring-4 ring-white shadow-lg">
+                  <AvatarImage src={user.photoURL || ""} alt={user.displayName || ""} />
+                  <AvatarFallback className="bg-gradient-to-br from-orange-400 to-red-500 text-white font-bold text-xl">
+                    {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-900 text-lg">
+                    {user.displayName || "Usuario"}
+                  </h3>
+                  <p className="text-gray-600 text-sm">{user.email}</p>
+                  <div className="flex items-center mt-2">
+                    <Crown className="h-4 w-4 text-yellow-500 mr-1" />
+                    <span className="text-xs text-gray-500">Miembro Premium</span>
                   </div>
-                  {theme === themeOption.id && <Palette className="h-3 w-3" />}
-                </DropdownMenuItem>
+                </div>
+              </div>
+            </div>
+
+            {/* Menu Items */}
+            <div className="p-2">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    item.action()
+                    setShowDropdown(false)
+                  }}
+                  className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 rounded-lg bg-gray-100 group-hover:bg-orange-100 transition-colors duration-200">
+                      <item.icon className="h-5 w-5 text-gray-600 group-hover:text-orange-600" />
+                    </div>
+                    <span className="font-medium text-gray-700 group-hover:text-gray-900">
+                      {item.label}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {item.badge && (
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        item.badge === 'Pro' 
+                          ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white' 
+                          : 'bg-red-100 text-red-600'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                    <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
+                  </div>
+                </button>
               ))}
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-          
-          <DropdownMenuSeparator />
-          
-          {/* Ayuda y Soporte */}
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setShowHelp(true)}>
-            <HelpCircle className="mr-2 h-4 w-4" />
-            <span>Ayuda</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setShowPrivacy(true)}>
-            <Shield className="mr-2 h-4 w-4" />
-            <span>Privacidad</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuSeparator />
-          
-          {/* Cerrar Sesión */}
-          <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600 cursor-pointer">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Cerrar sesión</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+
+              {/* Theme Selector */}
+              <div className="p-4 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-medium text-gray-700">Tema</span>
+                  <Palette className="h-4 w-4 text-gray-500" />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {themes.slice(0, 3).map((themeOption) => (
+                    <button
+                      key={themeOption.id}
+                      onClick={() => handleThemeChange(themeOption.id)}
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                        theme === themeOption.id
+                          ? 'border-orange-500 bg-orange-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className={`w-full h-3 rounded-full bg-gradient-to-r ${themeOption.colors.primary} mb-2`}></div>
+                      <span className="text-xs font-medium text-gray-700">{themeOption.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Logout Button */}
+              <div className="p-4 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    handleSignOut()
+                    setShowDropdown(false)
+                  }}
+                  className="w-full flex items-center justify-center space-x-2 p-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span>Cerrar sesión</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Modales */}
       {showSettings && (
