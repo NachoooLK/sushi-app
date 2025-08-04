@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "@/hooks/use-toast"
 import { Separator } from "@/components/ui/separator"
+import { useTheme } from "@/components/theme-provider"
 
 export default function LoginForm() {
   const [email, setEmail] = useState("")
@@ -20,6 +21,8 @@ export default function LoginForm() {
   const [displayName, setDisplayName] = useState("")
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const { theme, themes } = useTheme()
+  const currentTheme = themes.find(t => t.id === theme)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -190,11 +193,11 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-3 md:p-4 bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
+    <div className={`min-h-screen flex items-center justify-center p-3 md:p-4 bg-gradient-to-br ${currentTheme?.colors.background}`}>
       <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
         <CardHeader className="text-center pb-4 md:pb-6">
           <div className="text-6xl md:text-8xl mb-4 md:mb-6 animate-bounce">🍣</div>
-          <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+          <CardTitle className={`text-2xl md:text-3xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
             Sushi Counter
           </CardTitle>
           <CardDescription className="text-base md:text-lg text-gray-600 mt-2">
@@ -250,7 +253,7 @@ export default function LoginForm() {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105" 
+                  className={`w-full h-12 ${currentTheme?.colors.button} text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105`}
                   disabled={loading}
                 >
                   {loading ? (
@@ -313,7 +316,7 @@ export default function LoginForm() {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105" 
+                  className={`w-full h-12 ${currentTheme?.colors.button} text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105`}
                   disabled={loading}
                 >
                   {loading ? (

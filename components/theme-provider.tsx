@@ -29,7 +29,8 @@ const themes: { id: Theme; name: string; colors: ThemeColors }[] = [
       accent: "orange",
       background: "from-orange-50 via-red-50 to-pink-50",
       card: "border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100",
-      text: "text-orange-600"
+      text: "text-orange-600",
+      button: "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
     }
   },
   {
@@ -41,7 +42,8 @@ const themes: { id: Theme; name: string; colors: ThemeColors }[] = [
       accent: "blue",
       background: "from-blue-50 via-cyan-50 to-teal-50",
       card: "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100",
-      text: "text-blue-600"
+      text: "text-blue-600",
+      button: "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
     }
   },
   {
@@ -53,7 +55,8 @@ const themes: { id: Theme; name: string; colors: ThemeColors }[] = [
       accent: "green",
       background: "from-green-50 via-emerald-50 to-teal-50",
       card: "border-green-200 bg-gradient-to-br from-green-50 to-green-100",
-      text: "text-green-600"
+      text: "text-green-600",
+      button: "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
     }
   },
   {
@@ -65,7 +68,8 @@ const themes: { id: Theme; name: string; colors: ThemeColors }[] = [
       accent: "pink",
       background: "from-pink-50 via-orange-50 to-yellow-50",
       card: "border-pink-200 bg-gradient-to-br from-pink-50 to-pink-100",
-      text: "text-pink-600"
+      text: "text-pink-600",
+      button: "bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600"
     }
   },
   {
@@ -77,7 +81,8 @@ const themes: { id: Theme; name: string; colors: ThemeColors }[] = [
       accent: "purple",
       background: "from-purple-50 via-indigo-50 to-blue-50",
       card: "border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100",
-      text: "text-purple-600"
+      text: "text-purple-600",
+      button: "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
     }
   }
 ]

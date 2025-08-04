@@ -18,6 +18,7 @@ import { useRooms } from "@/hooks/use-rooms"
 import { useRouter } from "next/navigation"
 import { useTheme } from "@/components/theme-provider"
 import ThemeSelector from "@/components/theme-selector"
+import TabNavigation from "@/components/tab-navigation"
 
 interface UserStats {
   totalSushi: number
@@ -87,16 +88,16 @@ export default function Dashboard({ user }: DashboardProps) {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme?.colors.background} p-4 transition-all duration-300`}>
       <div className="max-w-6xl mx-auto">
-        {/* Header mejorado */}
-        <div className="mb-6 md:mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="text-3xl md:text-4xl animate-pulse">🍣</div>
+        {/* Header compacto */}
+        <div className="mb-4 md:mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="text-2xl md:text-3xl animate-pulse">🍣</div>
               <div>
-                <h1 className={`text-2xl md:text-4xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
+                <h1 className={`text-xl md:text-3xl font-bold bg-gradient-to-r ${currentTheme?.colors.primary} bg-clip-text text-transparent`}>
                   Sushi Counter
                 </h1>
-                <p className="text-sm md:text-lg text-gray-600 mt-1">
+                <p className="text-xs md:text-sm text-gray-600 mt-1">
                   ¡Hola <span className={`font-semibold ${currentTheme?.colors.text}`}>{user.displayName || user.email}</span>! 👋
                 </p>
               </div>
@@ -107,79 +108,55 @@ export default function Dashboard({ user }: DashboardProps) {
             </div>
           </div>
 
-          {/* Stats Cards mejorados */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300`}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className={`text-sm font-medium ${currentTheme?.colors.text}`}>Total Sushi</CardTitle>
-                <div className="text-3xl animate-bounce">🍣</div>
-              </CardHeader>
-              <CardContent>
-                <div className={`text-3xl font-bold ${currentTheme?.colors.text}`}>{userStats.totalSushi.toLocaleString()}</div>
-                <p className={`text-xs ${currentTheme?.colors.text} mt-1`}>Piezas consumidas</p>
-              </CardContent>
+          {/* Stats Cards compactos */}
+          <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4">
+            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300 p-3`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className={`text-lg font-bold ${currentTheme?.colors.text}`}>{userStats.totalSushi.toLocaleString()}</div>
+                  <div className="text-xs text-gray-500">Total Sushi</div>
+                </div>
+                <div className="text-2xl">🍣</div>
+              </div>
             </Card>
 
-            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300`}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className={`text-sm font-medium ${currentTheme?.colors.text}`}>Partidas Jugadas</CardTitle>
-                <Users className={`h-5 w-5 ${currentTheme?.colors.text}`} />
-              </CardHeader>
-              <CardContent>
-                <div className={`text-3xl font-bold ${currentTheme?.colors.text}`}>{userStats.gamesPlayed}</div>
-                <p className={`text-xs ${currentTheme?.colors.text} mt-1`}>Sesiones completadas</p>
-              </CardContent>
+            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300 p-3`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className={`text-lg font-bold ${currentTheme?.colors.text}`}>{userStats.gamesPlayed}</div>
+                  <div className="text-xs text-gray-500">Partidas</div>
+                </div>
+                <Users className={`h-4 w-4 ${currentTheme?.colors.text}`} />
+              </div>
             </Card>
 
-            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300`}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className={`text-sm font-medium ${currentTheme?.colors.text}`}>Victorias</CardTitle>
-                <Trophy className={`h-5 w-5 ${currentTheme?.colors.text}`} />
-              </CardHeader>
-              <CardContent>
-                <div className={`text-3xl font-bold ${currentTheme?.colors.text}`}>{userStats.wins}</div>
-                <p className={`text-xs ${currentTheme?.colors.text} mt-1`}>Partidas ganadas</p>
-              </CardContent>
+            <Card className={`${currentTheme?.colors.card} hover:shadow-lg transition-all duration-300 p-3`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className={`text-lg font-bold ${currentTheme?.colors.text}`}>{userStats.wins}</div>
+                  <div className="text-xs text-gray-500">Victorias</div>
+                </div>
+                <Trophy className={`h-4 w-4 ${currentTheme?.colors.text}`} />
+              </div>
             </Card>
           </div>
         </div>
 
-        {/* Tabs mejorados */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-xl text-xs md:text-sm">
-            <TabsTrigger 
-              value="rooms" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all rounded-lg"
-            >
-              <Users className="h-4 w-4" />
-              Salas
-            </TabsTrigger>
-            <TabsTrigger 
-              value="rankings" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all rounded-lg"
-            >
-              <Trophy className="h-4 w-4" />
-              Rankings
-            </TabsTrigger>
-            <TabsTrigger 
-              value="history" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all rounded-lg"
-            >
-              <Calendar className="h-4 w-4" />
-              Historial
-            </TabsTrigger>
-          </TabsList>
+        {/* Navegación por pestañas */}
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-          <TabsContent value="rooms" className="space-y-6 mt-6">
-            {/* Cards de acción mejorados */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-xl transition-all duration-300">
+        {/* Contenido de las pestañas */}
+        {activeTab === "rooms" && (
+          <div className="space-y-4 mt-4">
+            {/* Cards de acción compactos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+              <Card className={`${currentTheme?.colors.card} hover:shadow-xl transition-all duration-300`}>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-green-700">
+                  <CardTitle className={`flex items-center gap-2 ${currentTheme?.colors.text}`}>
                     <Plus className="h-5 w-5" />
                     Crear Sala
                   </CardTitle>
-                  <CardDescription className="text-green-600">
+                  <CardDescription className={currentTheme?.colors.text}>
                     Crea una nueva sala para jugar con tus amigos
                   </CardDescription>
                 </CardHeader>
@@ -188,13 +165,13 @@ export default function Dashboard({ user }: DashboardProps) {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-xl transition-all duration-300">
+              <Card className={`${currentTheme?.colors.card} hover:shadow-xl transition-all duration-300`}>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-purple-700">
+                  <CardTitle className={`flex items-center gap-2 ${currentTheme?.colors.text}`}>
                     <Search className="h-5 w-5" />
                     Unirse a Sala
                   </CardTitle>
-                  <CardDescription className="text-purple-600">
+                  <CardDescription className={currentTheme?.colors.text}>
                     Únete a una sala existente con el ID
                   </CardDescription>
                 </CardHeader>
@@ -203,20 +180,20 @@ export default function Dashboard({ user }: DashboardProps) {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-xl transition-all duration-300">
+              <Card className={`${currentTheme?.colors.card} hover:shadow-xl transition-all duration-300`}>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-orange-700">
+                  <CardTitle className={`flex items-center gap-2 ${currentTheme?.colors.text}`}>
                     <Target className="h-5 w-5" />
                     Modo Solitario
                   </CardTitle>
-                  <CardDescription className="text-orange-600">
+                  <CardDescription className={currentTheme?.colors.text}>
                     Juega solo y mejora tus habilidades
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button 
                     onClick={() => router.push('/solo')} 
-                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                    className={`w-full ${currentTheme?.colors.button}`}
                   >
                     <Target className="h-4 w-4 mr-2" />
                     Jugar Solo
@@ -225,80 +202,91 @@ export default function Dashboard({ user }: DashboardProps) {
               </Card>
             </div>
 
-            {/* Salas Activas mejoradas */}
+            {/* Salas Activas compactas */}
             <Card className="bg-white/80 backdrop-blur-sm border-gray-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <Clock className="h-5 w-5 text-orange-500" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-gray-800 text-base">
+                  <Clock className="h-4 w-4 text-orange-500" />
                   Salas Activas ({rooms.length})
                 </CardTitle>
-                <CardDescription>Salas disponibles para unirse</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 {loading ? (
-                  <div className="text-center py-8">
-                    <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">Cargando salas...</p>
+                  <div className="text-center py-4">
+                    <div className="w-6 h-6 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                    <p className="text-sm text-gray-600">Cargando...</p>
                   </div>
                 ) : rooms.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-6xl mb-4">🏠</div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No hay salas activas</h3>
-                    <p className="text-gray-500 mb-4">¡Sé el primero en crear una sala!</p>
+                  <div className="text-center py-4">
+                    <div className="text-4xl mb-2">🏠</div>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-1">No hay salas activas</h3>
+                    <p className="text-xs text-gray-500 mb-3">¡Sé el primero en crear una sala!</p>
                     <Button 
+                      size="sm"
                       onClick={() => setActiveTab("rooms")}
-                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                      className={currentTheme?.colors.button}
                     >
                       Crear Sala
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-3 md:space-y-4">
-                    {rooms.map((room) => (
+                  <div className="space-y-2">
+                    {rooms.slice(0, 3).map((room) => (
                       <div
                         key={room.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 hover:shadow-md gap-3"
+                        className="flex items-center justify-between p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 gap-2"
                       >
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 text-base md:text-lg">{room.name}</h3>
-                          <p className="text-xs md:text-sm text-gray-500 flex items-center gap-2">
-                            <Users className="h-3 w-3 md:h-4 md:w-4" />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-800 text-sm truncate">{room.name}</h3>
+                          <p className="text-xs text-gray-500 flex items-center gap-1">
+                            <Users className="h-3 w-3" />
                             {room.players.length} jugadores
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 md:gap-3">
+                        <div className="flex items-center gap-1">
                           <Badge 
                             variant="outline" 
-                            className="cursor-pointer hover:bg-orange-50 border-orange-200 text-orange-700 transition-colors text-xs" 
+                            className="cursor-pointer hover:bg-orange-50 border-orange-200 text-orange-700 transition-colors text-xs px-2 py-1" 
                             onClick={() => copyRoomId(room.id)}
                           >
                             <Copy className="h-3 w-3 mr-1" />
-                            {room.id.slice(0, 8)}...
+                            {room.id.slice(0, 6)}...
                           </Badge>
                           <Button 
                             size="sm" 
                             onClick={() => joinRoom(room.id)}
-                            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-xs"
+                            className={`${currentTheme?.colors.button} text-xs px-3 py-1`}
                           >
                             Unirse
                           </Button>
                         </div>
                       </div>
                     ))}
+                    {rooms.length > 3 && (
+                      <div className="text-center pt-2">
+                        <p className="text-xs text-gray-500">+{rooms.length - 3} salas más</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="rankings" className="mt-6">
+        {/* Contenido de rankings */}
+        {activeTab === "rankings" && (
+          <div className="mt-4">
             <Rankings />
-          </TabsContent>
-          
-          <TabsContent value="history" className="mt-6">
+          </div>
+        )}
+
+        {/* Contenido de historial */}
+        {activeTab === "history" && (
+          <div className="mt-4">
             <GameHistory />
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
     </div>
   )
