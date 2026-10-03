@@ -1,15 +1,15 @@
 "use client"
 
-import { Medal, Trophy } from "lucide-react"
+import { ChevronRight, CircleAlert, RefreshCw, Trophy } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 import { AppShell } from "@/components/app-shell"
-import { PositionBadge } from "@/components/session/parts"
-import { Avatar, cx, EmptyState, SectionTitle, Segmented, Spinner } from "@/components/ui"
+import { Avatar, Button, cx, Empty, PositionMark, Seg } from "@/components/ui"
 import { useAuth } from "@/lib/auth"
 import { formatDay } from "@/lib/format"
+import { resultHref } from "@/lib/routes"
 import { fetchFinishedSessions } from "@/lib/sessions"
-import { buildLeaderboard, periodStart, topPerformances } from "@/lib/stats"
+import { buildLeaderboard, periodStart, topPerformances, type LeaderboardRow, type Performance } from "@/lib/stats"
 import type { Period, Session } from "@/lib/types"
 
 const PERIODS: { value: Period; label: string }[] = [
@@ -23,124 +23,203 @@ const EMPTY_COPY: Record<Period, string> = {
   today: "Hoy todavía no se ha cerrado ninguna mesa.",
   week: "Esta semana todavía no se ha cerrado ninguna mesa.",
   month: "Este mes todavía no se ha cerrado ninguna mesa.",
-  all: "Todavía no se ha cerrado ninguna mesa.",
+  all: "Aún no se ha cerrado ninguna mesa.",
 }
+
+const MAX_ROWS = 50
 
 export default function RankingsPage() {
   return (
-    <AppShell>
+    <AppShell width="rankings">
       <Rankings />
     </AppShell>
   )
 }
 
+type Load = { key: string; sessions: Session[] } | { key: string; error: true }
+
 function Rankings() {
   const { user } = useAuth()
   const [period, setPeriod] = useState<Period>("month")
-  const [state, setState] = useState<{ period: Period; sessions: Session[] } | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
+  const [load, setLoad] = useState<Load | null>(null)
+  const key = `${period}:${attempt}`
 
   useEffect(() => {
+    // Si cambias de periodo antes de que llegue la respuesta, la anterior se descarta.
     let cancelled = false
-    setError(null)
     fetchFinishedSessions(periodStart(period))
       .then((sessions) => {
-        if (!cancelled) setState({ period, sessions })
+        if (!cancelled) setLoad({ key, sessions })
       })
       .catch(() => {
-        if (!cancelled) setError("No se han podido cargar los rankings.")
+        if (!cancelled) setLoad({ key, error: true })
       })
     return () => {
       cancelled = true
     }
-  }, [period])
+  }, [key, period])
 
-  const loading = state?.period !== period && !error
-  const sessions = useMemo(() => state?.sessions ?? [], [state])
-  const leaderboard = useMemo(() => buildLeaderboard(sessions), [sessions])
-  const records = useMemo(() => topPerformances(sessions, 5), [sessions])
+  const current = load?.key === key ? load : null
+  const sessions = current && "sessions" in current ? current.sessions : null
+  const leaderboard = useMemo(() => (sessions ? buildLeaderboard(sessions) : []), [sessions])
+  const marks = useMemo(() => (sessions ? topPerformances(sessions, 5) : []), [sessions])
 
   return (
-    <div className="space-y-6 pt-2">
-      <section>
-        <h1 className="font-display text-3xl font-extrabold tracking-tight">Rankings</h1>
-        <p className="mt-1 text-muted">Quién ha comido más sushi en Sushi Rush.</p>
-      </section>
+    <>
+      <header>
+        <h1 className="text-title text-ink lg:text-[40px] lg:leading-[46px] lg:tracking-[-0.035em]">Rankings</h1>
+        <p className="mt-1.5 text-body-lg text-ink-2 lg:text-[18px] lg:leading-[26px]">
+          Quién ha comido más sushi en Sushi Rush.
+        </p>
+      </header>
 
-      <Segmented label="Periodo" value={period} onChange={setPeriod} options={PERIODS} />
+      <div className="mt-5 lg:max-w-[420px]">
+        <Seg label="Periodo" value={period} options={PERIODS} onChange={setPeriod} />
+      </div>
 
-      {loading ? (
-        <div className="grid place-items-center py-16 text-muted">
-          <Spinner className="size-6" />
+      {!current ? (
+        <RankingsSkeleton />
+      ) : "error" in current ? (
+        <div className="mt-6 border-t border-line">
+          <Empty
+            icon={CircleAlert}
+            title="No se han podido cargar los rankings."
+            action={
+              <Button kind="secondary" icon={RefreshCw} onClick={() => setAttempt((n) => n + 1)}>
+                Reintentar
+              </Button>
+            }
+          >
+            Revisa tu conexión e inténtalo otra vez.
+          </Empty>
         </div>
-      ) : error ? (
-        <p className="text-sm text-danger">{error}</p>
       ) : leaderboard.length === 0 ? (
-        <EmptyState icon={<Trophy className="size-8" />} title="Sin resultados">
-          {EMPTY_COPY[period]}
-        </EmptyState>
+        <div className="mt-6 border-t border-line">
+          <Empty icon={Trophy} title={EMPTY_COPY[period]} />
+        </div>
       ) : (
-        <>
-          <section>
-            <SectionTitle>Más piezas</SectionTitle>
-            <ol className="space-y-2">
-              {leaderboard.slice(0, 50).map((row) => {
-                const position = 1 + leaderboard.filter((other) => other.pieces > row.pieces).length
-                const isMe = row.uid === user?.uid
-                return (
-                  <li
-                    key={row.uid}
-                    className={cx(
-                      "flex items-center gap-3 rounded-2xl border px-3 py-2.5",
-                      isMe ? "border-accent/40 bg-accent-soft/60" : "border-line bg-surface",
-                    )}
-                  >
-                    <PositionBadge position={position} />
-                    <Avatar name={row.name} photoURL={row.photoURL} seed={row.uid} size={38} />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-semibold">
-                        {row.name}
-                        {isMe ? <span className="text-sm font-medium text-accent"> · tú</span> : null}
-                      </p>
-                      <p className="truncate text-xs text-muted">
-                        {row.sessions} {row.sessions === 1 ? "mesa" : "mesas"} · {row.wins}{" "}
-                        {row.wins === 1 ? "victoria" : "victorias"} · récord {row.best}
-                      </p>
-                    </div>
-                    <span className="font-display text-2xl font-extrabold tabular" aria-label={`${row.pieces} piezas`}>
-                      {row.pieces}
-                    </span>
-                  </li>
-                )
-              })}
+        <div className="mt-7 lg:mt-8 lg:grid lg:grid-cols-[1.35fr_1fr] lg:gap-16">
+          <section aria-labelledby="rankings-most">
+            <h2 id="rankings-most" className="text-h2 text-ink">
+              Más piezas
+            </h2>
+            <ol className="mt-1.5 px-3">
+              {leaderboard.slice(0, MAX_ROWS).map((row) => (
+                <LeaderRow
+                  key={row.uid}
+                  row={row}
+                  position={1 + leaderboard.filter((other) => other.pieces > row.pieces).length}
+                  blank={leaderboard[0].pieces === 0}
+                  me={row.uid === user?.uid}
+                />
+              ))}
             </ol>
           </section>
 
-          {records.length ? (
-            <section>
-              <SectionTitle>Mejores marcas en una mesa</SectionTitle>
-              <ol className="divide-y divide-line overflow-hidden rounded-3xl border border-line bg-surface">
-                {records.map((record, index) => (
-                  <li key={`${record.sessionCode}-${record.uid}`}>
-                    <Link href={`/s/${record.sessionCode}`} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-2">
-                      <Medal className={cx("size-5 shrink-0", index === 0 ? "text-gold" : "text-muted")} />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-semibold">{record.name}</p>
-                        <p className="truncate text-xs text-muted">
-                          {record.restaurant ?? record.sessionName} · {formatDay(record.finishedAt)}
-                        </p>
-                      </div>
-                      <span className="font-display text-xl font-extrabold tabular">{record.count}</span>
-                    </Link>
-                  </li>
+          <section aria-labelledby="rankings-marks" className="mt-9 lg:mt-0">
+            <h2 id="rankings-marks" className="text-h2 text-ink">
+              Mejores marcas en una mesa
+            </h2>
+            {marks.length ? (
+              <ol className="mt-1.5">
+                {marks.map((mark, index) => (
+                  <MarkRow key={`${mark.sessionCode}-${mark.uid}`} mark={mark} index={index + 1} />
                 ))}
               </ol>
-            </section>
-          ) : null}
-
-          <p className="text-center text-xs text-muted">Las victorias sólo cuentan en mesas de dos o más personas.</p>
-        </>
+            ) : null}
+            <p className="mt-5 text-caption text-pretty text-ink-3">
+              Las victorias sólo cuentan en mesas de dos o más personas.
+            </p>
+          </section>
+        </div>
       )}
+    </>
+  )
+}
+
+function plural(count: number, one: string, many: string) {
+  return `${count} ${count === 1 ? one : many}`
+}
+
+function LeaderRow({ row, position, blank, me }: { row: LeaderboardRow; position: number; blank: boolean; me: boolean }) {
+  return (
+    <li
+      className={cx(
+        "-mx-3 flex min-h-[76px] items-center gap-3 border-b px-3",
+        me ? "rounded-btn border-transparent bg-accent-soft" : "border-line",
+      )}
+    >
+      <PositionMark position={position} size={28} blank={blank} />
+      <Avatar name={row.name} photoURL={row.photoURL} seed={row.uid} size={40} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-base leading-[22px] font-semibold text-ink">
+          {row.name}
+          {me ? <span className="text-accent-ink"> · tú</span> : null}
+        </p>
+        <p className="truncate text-caption text-ink-2 tabular-nums">
+          {plural(row.sessions, "mesa", "mesas")} · {plural(row.wins, "victoria", "victorias")} · récord {row.best}
+        </p>
+      </div>
+      <p
+        className={cx(
+          "shrink-0 text-[26px] leading-8 font-semibold tracking-[-0.02em] tabular-nums",
+          me ? "text-accent-ink" : "text-ink",
+        )}
+      >
+        {row.pieces}
+        <span className="sr-only"> piezas</span>
+      </p>
+    </li>
+  )
+}
+
+function MarkRow({ mark, index }: { mark: Performance; index: number }) {
+  const where = [mark.restaurant?.trim() || mark.sessionName, formatDay(mark.finishedAt)].filter(Boolean).join(" · ")
+  return (
+    <li>
+      <Link href={resultHref(mark.sessionCode)} className="group flex min-h-[68px] items-center gap-3 border-b border-line">
+        <span className="w-5 shrink-0 text-[15px] leading-none font-semibold text-ink-3 tabular-nums">{index}</span>
+        <Avatar name={mark.name} photoURL={mark.photoURL} seed={mark.uid} size={36} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-base leading-[22px] font-semibold text-ink">{mark.name}</p>
+          <p className="truncate text-caption text-ink-2">{where}</p>
+        </div>
+        <p className="shrink-0 text-[26px] leading-8 font-semibold tracking-[-0.02em] text-ink tabular-nums">
+          {mark.count}
+          <span className="sr-only"> piezas</span>
+        </p>
+        <ChevronRight
+          size={20}
+          className="shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5 lg:hidden"
+          aria-hidden
+        />
+      </Link>
+    </li>
+  )
+}
+
+function Bone({ className }: { className: string }) {
+  return <span aria-hidden className={cx("block shrink-0 animate-skeleton bg-sf", className)} />
+}
+
+function RankingsSkeleton() {
+  return (
+    <div role="status" aria-label="Cargando los rankings">
+      <Bone className="mt-7 h-[26px] w-[140px] rounded-lg" />
+      <div className="mt-3">
+        {Array.from({ length: 6 }, (_, index) => (
+          <div key={index} className="flex h-[72px] items-center gap-3 border-b border-line">
+            <Bone className="size-7 rounded-full" />
+            <Bone className="size-10 rounded-full" />
+            <div className="flex flex-1 flex-col gap-2">
+              <Bone className="h-3.5 w-2/5 rounded-[7px]" />
+              <Bone className="h-[11px] w-[70%] rounded-md" />
+            </div>
+            <Bone className="h-[26px] w-11 rounded-lg" />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

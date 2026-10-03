@@ -26,7 +26,7 @@ describe("normalizeCode", () => {
   })
 
   it("extrae el código de un enlace completo", () => {
-    expect(normalizeCode("https://sushi.app/s/K7P2QX?invitar=1")).toBe("K7P2QX")
+    expect(normalizeCode("https://sushi.app/mesa/K7P2QX/resultado")).toBe("K7P2QX")
   })
 
   it("rechaza longitudes o caracteres inválidos", () => {

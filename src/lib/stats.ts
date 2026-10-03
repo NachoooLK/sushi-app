@@ -33,8 +33,9 @@ export function standingLine(ranked: RankedPlayer[], uid: string): string {
     if (tied.length) return `Empatas en cabeza con ${joinNames(tied.map((player) => player.name))}`
     return `Vas primero, ${countLabel(me.count - best.count)} por delante de ${best.name}`
   }
-  const leader = ranked[0]
-  return `Vas ${me.position}.º, a ${countLabel(leader.count - me.count)} de ${leader.name}`
+  // La referencia es quien va justo delante, no el líder.
+  const ahead = ranked.filter((player) => player.count > me.count).at(-1)!
+  return `Vas ${me.position}.º, a ${countLabel(ahead.count - me.count)} de ${ahead.name}`
 }
 
 function countLabel(count: number) {

@@ -1,55 +1,66 @@
 "use client"
 
-import { ArrowRight } from "lucide-react"
+import { CircleAlert } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState, type FormEvent } from "react"
+import { useId, useState, type FormEvent } from "react"
 import { normalizeCode } from "@/lib/code"
-import { Button } from "./ui"
+import { tableHref } from "@/lib/routes"
+import { Button, cx, Field } from "./ui"
 
-export function JoinByCode() {
+const CODE_ERROR = "El código tiene 6 caracteres, por ejemplo K7P 2QX."
+
+/** "¿Te han pasado un código?": campo de código (admite pegar el enlace de la mesa) + "Unirme". */
+export function JoinByCode({ className }: { className?: string }) {
   const router = useRouter()
+  const titleId = useId()
+  const errorId = useId()
   const [value, setValue] = useState("")
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(false)
 
   function submit(event: FormEvent) {
     event.preventDefault()
     const code = normalizeCode(value)
     if (!code) {
-      setError("El código tiene 6 caracteres, por ejemplo K7P 2QX.")
+      setError(true)
       return
     }
-    router.push(`/s/${code}`)
+    setError(false)
+    router.push(tableHref(code))
   }
 
   return (
-    <form onSubmit={submit} noValidate>
-      <label htmlFor="join-code" className="mb-1.5 block text-sm font-medium">
+    <form onSubmit={submit} noValidate aria-labelledby={titleId} className={cx("flex flex-col gap-2.5", className)}>
+      <h2 id={titleId} className="text-[15px] leading-5 font-semibold text-ink">
         ¿Te han pasado un código?
-      </label>
-      <div className="flex gap-2">
-        <input
-          id="join-code"
-          value={value}
-          onChange={(event) => {
-            setValue(event.target.value.toUpperCase())
-            setError(null)
-          }}
+      </h2>
+      <div className="flex items-start gap-2.5">
+        <Field
+          code
+          aria-labelledby={titleId}
+          aria-describedby={error ? errorId : undefined}
           placeholder="K7P 2QX"
           autoComplete="off"
           autoCapitalize="characters"
+          autoCorrect="off"
           spellCheck={false}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? "join-code-error" : undefined}
-          className="h-12 min-w-0 flex-1 rounded-2xl border border-line bg-surface px-4 font-display text-lg font-bold uppercase tracking-[0.2em] text-ink outline-none placeholder:font-sans placeholder:text-base placeholder:font-normal placeholder:tracking-normal placeholder:text-muted/70 focus:border-accent focus:ring-4 focus:ring-accent/15"
+          enterKeyHint="go"
+          value={value}
+          onChange={(event) => {
+            setValue(event.target.value)
+            if (error) setError(false)
+          }}
+          // El mensaje va en una línea propia bajo la fila (como en el diseño); el campo solo marca el error.
+          invalid={error}
+          className="flex-1"
         />
-        <Button type="submit" variant="secondary" className="h-12 px-4" aria-label="Unirme a la mesa">
+        <Button type="submit" kind="secondary" className="w-[100px] px-0">
           Unirme
-          <ArrowRight className="size-4" />
         </Button>
       </div>
       {error ? (
-        <p id="join-code-error" role="alert" className="mt-1.5 text-sm text-danger">
-          {error}
+        <p id={errorId} role="alert" className="flex items-start gap-2 text-[14px] leading-5 font-medium text-danger">
+          <CircleAlert size={18} className="mt-px shrink-0" aria-hidden />
+          <span>{CODE_ERROR}</span>
         </p>
       ) : null}
     </form>

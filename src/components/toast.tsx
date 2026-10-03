@@ -1,7 +1,7 @@
 "use client"
 
-import { CircleAlert, CircleCheck, Info } from "lucide-react"
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react"
+import { CircleAlert, CircleCheckBig, Info } from "lucide-react"
+import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react"
 import { cx } from "./ui"
 
 type Tone = "info" | "success" | "error"
@@ -10,9 +10,16 @@ interface Toast {
   id: number
   message: string
   tone: Tone
+  leaving: boolean
 }
 
 const ToastContext = createContext<(message: string, tone?: Tone) => void>(() => {})
+
+const ICONS = {
+  info: <Info size={22} className="text-ink-2" aria-hidden />,
+  success: <CircleCheckBig size={22} className="text-accent-ink" aria-hidden />,
+  error: <CircleAlert size={22} className="text-danger" aria-hidden />,
+}
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
@@ -20,33 +27,28 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const show = useCallback((message: string, tone: Tone = "info") => {
     const id = ++nextId.current
-    setToasts((current) => [...current.slice(-2), { id, message, tone }])
-    window.setTimeout(() => setToasts((current) => current.filter((toast) => toast.id !== id)), 3200)
+    setToasts((current) => [...current.slice(-2), { id, message, tone, leaving: false }])
+    window.setTimeout(() => {
+      setToasts((current) => current.map((toast) => (toast.id === id ? { ...toast, leaving: true } : toast)))
+    }, 3000)
+    window.setTimeout(() => setToasts((current) => current.filter((toast) => toast.id !== id)), 3180)
   }, [])
 
-  const value = useMemo(() => show, [show])
-
   return (
-    <ToastContext value={value}>
+    <ToastContext value={show}>
       {children}
-      <div
-        aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))]"
-      >
+      <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+4px)] z-[60] flex flex-col items-center gap-2 px-4">
         {toasts.map((toast) => (
           <div
             key={toast.id}
             role={toast.tone === "error" ? "alert" : "status"}
-            className="pointer-events-auto flex max-w-sm animate-slide-up items-center gap-2.5 rounded-2xl border border-line bg-surface px-4 py-3 text-sm font-medium shadow-card"
-          >
-            {toast.tone === "success" ? (
-              <CircleCheck className="size-5 shrink-0 text-wasabi" />
-            ) : toast.tone === "error" ? (
-              <CircleAlert className="size-5 shrink-0 text-danger" />
-            ) : (
-              <Info className={cx("size-5 shrink-0 text-accent")} />
+            className={cx(
+              "pointer-events-auto flex w-full max-w-[420px] animate-toast-in items-start gap-3 rounded-2xl border border-line bg-raised px-4 py-3.5 text-body font-medium text-ink shadow-pop transition-[opacity,transform] duration-[180ms]",
+              toast.leaving && "-translate-y-3 opacity-0",
             )}
-            {toast.message}
+          >
+            <span className="flex shrink-0">{ICONS[toast.tone]}</span>
+            <span className="min-w-0 flex-1">{toast.message}</span>
           </div>
         ))}
       </div>

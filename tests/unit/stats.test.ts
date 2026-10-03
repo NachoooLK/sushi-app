@@ -86,7 +86,15 @@ describe("standingLine", () => {
     expect(line).toBe("Vas primero, 3 piezas por delante de Ana")
   })
 
-  it("explica la distancia al líder", () => {
+  it("mide la distancia con quien va justo delante, no con el líder", () => {
+    const line = standingLine(
+      rankPlayers([player("me", 9), player("ana", 18, 0, "Ana"), player("dani", 12, 0, "Dani")]),
+      "me",
+    )
+    expect(line).toBe("Vas 3.º, a 3 piezas de Dani")
+  })
+
+  it("explica la distancia al de delante", () => {
     const line = standingLine(rankPlayers([player("me", 4), player("ana", 5, 0, "Ana"), player("bo", 1)]), "me")
     expect(line).toBe("Vas 2.º, a 1 pieza de Ana")
   })

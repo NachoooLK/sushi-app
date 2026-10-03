@@ -9,6 +9,12 @@ Cuenta cada pieza del libre de sushi con tus amigos, con ranking en directo.
 
 El modo solitario es una mesa sin invitados: cuenta para tus récords pero no como victoria.
 
+## Diseño
+
+La interfaz sigue el handoff "Sushi Rush (app web móvil)": diseño clean con neutros cálidos y un único acento verde, tipografía Geist, modo claro y oscuro (según el sistema) y versión de escritorio a dos columnas. Los tokens viven en `src/app/globals.css` y los componentes base en `src/components/ui.tsx`.
+
+Rutas: `/` (inicio), `/mesa/nueva`, `/mesa/[código]` (mesa en directo o invitación), `/mesa/[código]/resultado`, `/rankings`, `/historial`, `/perfil`. El acceso se muestra en la misma URL, así un enlace de invitación sigue funcionando tras entrar.
+
 ## Stack
 
 - Next.js 16 (App Router) + React 19 + Tailwind CSS 4, desplegado en Vercel.
@@ -41,6 +47,7 @@ Con los emuladores de Firebase (necesitan Java 11+):
 ```bash
 npm run emulators      # Auth en :9099, Firestore en :8080
 npm run dev:emu        # la app apuntando a los emuladores, con acceso de invitado
+npm run seed         # datos de ejemplo: entra con marta@test.dev / sushi123
 npm run bot -- K7P2QX "Ana" 15 1500   # un comensal simulado se une y suma piezas
 ```
 

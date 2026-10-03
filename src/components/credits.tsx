@@ -1,12 +1,12 @@
 export function Credits() {
   return (
-    <p className="text-center text-xs text-muted">
+    <p className="text-center text-caption text-ink-3">
       Hecho por{" "}
       <a
         href="https://github.com/NachoooLK"
         target="_blank"
         rel="noopener noreferrer"
-        className="font-semibold text-ink underline-offset-4 hover:underline"
+        className="text-ink-2 underline underline-offset-2"
       >
         NachoLK
       </a>

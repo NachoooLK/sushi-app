@@ -1,136 +1,298 @@
 "use client"
 
-import { X } from "lucide-react"
+import { CircleAlert, type LucideIcon } from "lucide-react"
+import Link from "next/link"
 import {
-  useEffect,
   useId,
-  useRef,
   type ButtonHTMLAttributes,
+  type ComponentProps,
   type InputHTMLAttributes,
   type ReactNode,
+  type TextareaHTMLAttributes,
 } from "react"
 
 export function cx(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "danger"
-type ButtonSize = "sm" | "md" | "lg"
+/* ── Botón ─────────────────────────────────────────────────────────────── */
 
-const buttonVariants: Record<ButtonVariant, string> = {
-  primary: "bg-accent text-accent-ink hover:bg-accent-strong shadow-card",
-  secondary: "bg-surface text-ink border border-line hover:bg-surface-2",
-  ghost: "text-ink hover:bg-surface-2",
-  danger: "bg-surface text-danger border border-line hover:border-danger/60",
+export type ButtonKind = "primary" | "secondary" | "ghost" | "danger" | "dangerSolid"
+export type ButtonSize = "sm" | "md" | "lg"
+
+const KINDS: Record<ButtonKind, string> = {
+  primary: "bg-accent text-accent-on border-transparent hover:brightness-108 active:brightness-90",
+  secondary: "bg-transparent text-ink border-line-strong hover:bg-sf active:bg-line",
+  ghost: "bg-transparent text-ink-2 border-transparent hover:bg-sf active:bg-line",
+  danger: "bg-transparent text-danger border-danger hover:bg-sf active:brightness-90",
+  dangerSolid: "bg-danger text-danger-on border-transparent hover:brightness-108 active:brightness-90",
 }
 
-const buttonSizes: Record<ButtonSize, string> = {
-  sm: "h-9 px-3 text-sm gap-1.5 rounded-xl",
-  md: "h-11 px-4 text-[15px] gap-2 rounded-2xl",
-  lg: "h-14 px-6 text-base gap-2.5 rounded-2xl",
+const SIZES: Record<ButtonSize, string> = {
+  sm: "h-11 px-4 rounded-input text-[15px] leading-none",
+  md: "h-[52px] px-[22px] rounded-btn text-base leading-none",
+  lg: "h-[60px] px-[22px] rounded-btn text-base leading-none",
+}
+
+export function buttonClass({
+  kind = "primary",
+  size = "md",
+  full = false,
+  className,
+}: { kind?: ButtonKind; size?: ButtonSize; full?: boolean; className?: string } = {}) {
+  return cx(
+    "inline-flex min-w-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap border font-semibold select-none",
+    "transition-[transform,filter,background-color] duration-[90ms] ease-out active:scale-[0.98]",
+    "disabled:pointer-events-none disabled:border-line disabled:bg-sf disabled:text-ink-3 disabled:brightness-100",
+    KINDS[kind],
+    SIZES[size],
+    full && "w-full",
+    className,
+  )
 }
 
 export function Button({
-  variant = "primary",
+  kind = "primary",
   size = "md",
+  full,
+  icon: Icon,
   loading = false,
-  block = false,
+  disabled,
   className,
   children,
-  disabled,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: ButtonVariant
+  kind?: ButtonKind
   size?: ButtonSize
+  full?: boolean
+  icon?: LucideIcon
   loading?: boolean
-  block?: boolean
 }) {
+  const iconSize = size === "lg" ? 24 : 20
   return (
     <button
       type="button"
       disabled={disabled || loading}
-      className={cx(
-        "inline-flex items-center justify-center font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
-        buttonVariants[variant],
-        buttonSizes[size],
-        block && "w-full",
-        className,
-      )}
+      aria-busy={loading || undefined}
+      className={buttonClass({ kind, size, full, className })}
       {...props}
     >
-      {loading ? <Spinner className="size-4" /> : null}
+      {loading ? <Spinner /> : Icon ? <Icon size={iconSize} aria-hidden /> : null}
       {children}
     </button>
   )
 }
 
-export function Spinner({ className }: { className?: string }) {
+export function ButtonLink({
+  kind = "primary",
+  size = "md",
+  full,
+  icon: Icon,
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof Link> & { kind?: ButtonKind; size?: ButtonSize; full?: boolean; icon?: LucideIcon }) {
   return (
-    <span
-      aria-hidden
-      className={cx("inline-block animate-spin rounded-full border-2 border-current border-r-transparent", className)}
-    />
+    <Link className={buttonClass({ kind, size, full, className })} {...props}>
+      {Icon ? <Icon size={size === "lg" ? 24 : 20} aria-hidden /> : null}
+      {children}
+    </Link>
   )
 }
 
-export function FullScreenLoader({ label = "Cargando…" }: { label?: string }) {
+export function Spinner({ size = 20, className }: { size?: number; className?: string }) {
   return (
-    <div className="grid min-h-dvh place-items-center" role="status">
-      <div className="flex flex-col items-center gap-4 text-muted">
-        <Logo className="size-14 animate-pulse" />
-        <span className="text-sm">{label}</span>
-      </div>
-    </div>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden className={cx("shrink-0", className)}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" strokeOpacity="0.25" />
+      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="origin-center animate-spin-fast" />
+    </svg>
   )
 }
 
-export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cx("rounded-3xl border border-line bg-surface shadow-card", className)}>{children}</div>
+/* ── Campos ────────────────────────────────────────────────────────────── */
+
+const FIELD_BOX =
+  "flex h-[52px] min-w-0 items-center gap-2.5 rounded-input border px-4 transition-[box-shadow,border-color] duration-150"
+
+function fieldState(error: boolean, disabled?: boolean) {
+  if (disabled) return "border-line bg-sf"
+  if (error) return "border-danger shadow-[0_0_0_3px_var(--err-soft)]"
+  return "border-line-strong focus-within:border-ink focus-within:shadow-[0_0_0_3px_var(--ac-soft)]"
 }
 
-export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
-  return (
-    <div className="mb-3 flex items-center justify-between gap-3">
-      <h2 className="font-display text-lg font-bold tracking-tight">{children}</h2>
-      {action}
-    </div>
-  )
+export function FieldMessage({ id, error, help }: { id: string; error?: string | null; help?: string }) {
+  if (error) {
+    return (
+      <p id={id} role="alert" className="flex items-start gap-1.5 text-caption font-medium text-danger">
+        <CircleAlert size={16} className="mt-px shrink-0" aria-hidden />
+        <span>{error}</span>
+      </p>
+    )
+  }
+  return help ? (
+    <p id={id} className="text-caption text-ink-3">
+      {help}
+    </p>
+  ) : null
 }
 
 export function Field({
   label,
-  hint,
+  icon: Icon,
+  help,
   error,
+  invalid = false,
+  code = false,
   className,
+  disabled,
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string; error?: string | null }) {
+}: InputHTMLAttributes<HTMLInputElement> & {
+  label?: string
+  icon?: LucideIcon
+  help?: string
+  error?: string | null
+  /** Pinta el estado de error sin mensaje, cuando el mensaje vive fuera del campo. */
+  invalid?: boolean
+  code?: boolean
+}) {
   const id = useId()
+  const messageId = `${id}-msg`
   return (
-    <label htmlFor={id} className={cx("block", className)}>
-      <span className="mb-1.5 block text-sm font-medium">{label}</span>
-      <input
-        id={id}
-        className="h-12 w-full rounded-2xl border border-line bg-surface px-4 text-base text-ink placeholder:text-muted/70 outline-none transition focus:border-accent focus:ring-4 focus:ring-accent/15"
-        aria-invalid={error ? true : undefined}
-        {...props}
-      />
-      {error ? (
-        <span className="mt-1.5 block text-sm text-danger">{error}</span>
-      ) : hint ? (
-        <span className="mt-1.5 block text-xs text-muted">{hint}</span>
+    <div className={cx("flex min-w-0 flex-col gap-1.5", className)}>
+      {label ? (
+        <label htmlFor={id} className="text-label text-ink-2">
+          {label}
+        </label>
       ) : null}
-    </label>
+      <div className={cx(FIELD_BOX, fieldState(Boolean(error) || invalid, disabled))}>
+        {Icon ? <Icon size={20} className="shrink-0 text-ink-3" aria-hidden /> : null}
+        <input
+          id={id}
+          disabled={disabled}
+          aria-invalid={error || invalid ? true : undefined}
+          aria-describedby={error || help ? messageId : undefined}
+          className={cx(
+            "h-full min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-ink-3 focus-visible:shadow-none disabled:text-ink-3",
+            code
+              ? "text-[22px] leading-7 font-semibold tracking-[0.14em] uppercase tabular-nums placeholder:normal-case"
+              : "text-[17px] leading-6",
+          )}
+          {...props}
+        />
+      </div>
+      <FieldMessage id={messageId} error={error} help={help} />
+    </div>
   )
 }
 
-const AVATAR_TONES = [
-  "bg-[#f9d5c8] text-[#8a2f15]",
-  "bg-[#d8ecc4] text-[#335d12]",
-  "bg-[#f6e3b0] text-[#7a5600]",
-  "bg-[#d6e2f5] text-[#24467a]",
-  "bg-[#ecd6ef] text-[#6b2a73]",
-  "bg-[#d3eee8] text-[#145e52]",
-]
+export function TextArea({
+  value,
+  maxLength = 280,
+  className,
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement> & { value: string; maxLength?: number }) {
+  return (
+    <div className={cx("flex flex-col gap-1.5", className)}>
+      <textarea
+        value={value}
+        maxLength={maxLength}
+        className="min-h-24 w-full resize-none rounded-input border border-line-strong bg-transparent px-4 py-3 text-base leading-6 text-ink outline-none transition-[box-shadow,border-color] duration-150 placeholder:text-ink-3 focus:border-ink focus:shadow-[0_0_0_3px_var(--ac-soft)] focus-visible:shadow-[0_0_0_3px_var(--ac-soft)]"
+        {...props}
+      />
+      <p className="text-right text-caption text-ink-3 tabular-nums" aria-live="off">
+        {value.length}/{maxLength}
+      </p>
+    </div>
+  )
+}
+
+/* ── Selector segmentado ───────────────────────────────────────────────── */
+
+export function Seg<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+  disabled,
+}: {
+  value: T
+  options: { value: T; label: string }[]
+  onChange: (value: T) => void
+  label: string
+  disabled?: boolean
+}) {
+  return (
+    <div role="radiogroup" aria-label={label} className="flex w-full gap-1 rounded-2xl border border-line p-1">
+      {options.map((option) => {
+        const active = option.value === value
+        return (
+          <button
+            key={option.value}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            disabled={disabled}
+            onClick={() => onChange(option.value)}
+            className={cx(
+              "flex h-11 flex-1 items-center justify-center rounded-input text-[15px] leading-none font-semibold whitespace-nowrap transition-colors duration-150",
+              active ? "bg-ink text-bg" : "text-ink-2 hover:bg-sf",
+            )}
+          >
+            {option.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ── Etiquetas ─────────────────────────────────────────────────────────── */
+
+export type TagKind = "live" | "you" | "host" | "record" | "neutral"
+
+const TAGS: Record<TagKind, string> = {
+  live: "text-accent-ink border-accent",
+  you: "text-accent-on bg-accent border-transparent",
+  host: "text-ink-2 border-line-strong",
+  record: "text-ink bg-accent-soft border-accent",
+  neutral: "text-ink-2 bg-sf border-transparent",
+}
+
+export function Tag({ kind = "neutral", big = false, children }: { kind?: TagKind; big?: boolean; children: ReactNode }) {
+  return (
+    <span
+      className={cx(
+        "inline-flex shrink-0 items-center gap-1.5 rounded-full border font-semibold whitespace-nowrap",
+        big ? "px-3 py-1 text-[14px] leading-5" : "px-2 py-px text-[12px] leading-[18px]",
+        TAGS[kind],
+      )}
+    >
+      {kind === "live" ? <span className="size-1.5 rounded-full bg-current" aria-hidden /> : null}
+      {kind === "record" ? (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M11.5 2.6a.6.6 0 0 1 1 0l2.8 5.8 6.3.9c.5.1.7.7.3 1l-4.6 4.5 1.1 6.3c.1.5-.4.9-.9.6L12 18.8l-5.6 2.9c-.5.3-1-.1-.9-.6l1.1-6.3L2 10.3c-.4-.3-.2-.9.3-1l6.3-.9 2.9-5.8Z" />
+        </svg>
+      ) : null}
+      {children}
+    </span>
+  )
+}
+
+/* ── Avatar, medalla, logo ─────────────────────────────────────────────── */
+
+const HUES = [25, 75, 120, 165, 205, 255, 305, 345]
+
+function hueFor(seed: string) {
+  let hash = 0
+  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
+  return HUES[hash % HUES.length]
+}
+
+export function initials(name: string) {
+  const words = name.trim().split(/\s+/).filter(Boolean)
+  if (!words.length) return "?"
+  return (words.length > 1 ? words[0][0] + words[1][0] : words[0][0]).toUpperCase()
+}
 
 export function Avatar({
   name,
@@ -141,36 +303,31 @@ export function Avatar({
 }: {
   name: string
   photoURL?: string | null
-  seed?: string
+  seed: string
   size?: number
   className?: string
 }) {
-  const key = seed ?? name
-  let hash = 0
-  for (const char of key) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
-  const initials = name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("")
+  const hue = hueFor(seed)
   return (
     <span
-      className={cx(
-        "relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full font-semibold",
-        AVATAR_TONES[hash % AVATAR_TONES.length],
-        className,
-      )}
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }}
       aria-hidden
+      className={cx("relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-semibold", className)}
+      style={{
+        width: size,
+        height: size,
+        fontSize: Math.round(size * 0.4),
+        lineHeight: 1,
+        background: `oklch(var(--avbl) 0.05 ${hue})`,
+        color: `oklch(var(--avfl) 0.1 ${hue})`,
+      }}
     >
-      {initials || "?"}
+      {initials(name)}
       {photoURL ? (
         <img
           src={photoURL}
           alt=""
           referrerPolicy="no-referrer"
-          className="absolute inset-0 size-full object-cover"
+          className="absolute inset-0 size-full rounded-full object-cover shadow-[inset_0_0_0_1px_var(--ln)]"
           onError={(event) => event.currentTarget.remove()}
         />
       ) : null}
@@ -178,152 +335,152 @@ export function Avatar({
   )
 }
 
-export function StatTile({
-  label,
-  value,
-  hint,
-  tone = "default",
+export function AvatarStack({
+  people,
+  size = 32,
+  max = 5,
 }: {
-  label: string
-  value: ReactNode
-  hint?: ReactNode
-  tone?: "default" | "accent" | "gold" | "wasabi"
+  people: { uid: string; name: string; photoURL: string | null }[]
+  size?: number
+  max?: number
 }) {
-  const tones = {
-    default: "bg-surface",
-    accent: "bg-accent-soft",
-    gold: "bg-gold-soft",
-    wasabi: "bg-wasabi-soft",
-  }
   return (
-    <div className={cx("rounded-2xl border border-line p-4", tones[tone])}>
-      <div className="text-xs font-medium uppercase tracking-wide text-muted">{label}</div>
-      <div className="mt-1 font-display text-2xl font-bold tracking-tight tabular">{value}</div>
-      {hint ? <div className="mt-0.5 truncate text-xs text-muted">{hint}</div> : null}
+    <span className="flex" aria-hidden>
+      {people.slice(0, max).map((person, index) => (
+        <Avatar
+          key={person.uid}
+          name={person.name}
+          photoURL={person.photoURL}
+          seed={person.uid}
+          size={size}
+          className={cx("ring-2 ring-bg", index > 0 && "-ml-2")}
+        />
+      ))}
+    </span>
+  )
+}
+
+const MEDAL_COLORS = ["bg-medal-gold", "bg-medal-silver", "bg-medal-bronze"]
+
+export function Medal({ position, size = 28 }: { position: number; size?: number }) {
+  return (
+    <span
+      role="img"
+      aria-label={`${position}.º puesto`}
+      className={cx(
+        "inline-flex shrink-0 items-center justify-center rounded-full font-bold text-medal-ink tabular-nums shadow-[inset_0_0_0_1.5px_rgba(0,0,0,.14)]",
+        MEDAL_COLORS[position - 1] ?? "bg-medal-silver",
+      )}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.5), lineHeight: 1 }}
+    >
+      {position}
+    </span>
+  )
+}
+
+/** Medalla para 1.º–3.º, número para el resto, y "–" cuando nadie ha comido todavía. */
+export function PositionMark({ position, size = 28, blank = false }: { position: number; size?: number; blank?: boolean }) {
+  return (
+    <span className="flex w-8 shrink-0 items-center justify-center">
+      {blank ? (
+        <span className="text-[17px] leading-none font-semibold text-ink-3">–</span>
+      ) : position <= 3 ? (
+        <Medal position={position} size={size} />
+      ) : (
+        <span className="text-[17px] leading-none font-semibold text-ink-2 tabular-nums" aria-label={`${position}.º puesto`}>
+          {position}
+        </span>
+      )}
+    </span>
+  )
+}
+
+export function Logo({ size = 32, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" className={cx("block shrink-0", className)} aria-hidden>
+      <circle cx="24" cy="24" r="22" fill="var(--fg)" />
+      <circle cx="24" cy="24" r="16.5" fill="var(--bg)" />
+      <circle cx="24" cy="24" r="7.5" fill="var(--ac)" />
+    </svg>
+  )
+}
+
+/* ── Estadísticas ──────────────────────────────────────────────────────── */
+
+export function StatGrid({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <dl className={cx("grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line bg-line", className)}>
+      {children}
+    </dl>
+  )
+}
+
+export function Stat({ label, value, sub, small = false }: { label: string; value: ReactNode; sub?: ReactNode; small?: boolean }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-1 bg-bg px-4 pt-4 pb-[18px]">
+      <dt className="text-caption font-medium text-ink-2">{label}</dt>
+      <dd
+        className={cx(
+          "truncate font-semibold tracking-[-0.02em] text-ink tabular-nums",
+          small ? "text-[22px] leading-[38px]" : "text-[32px] leading-[38px]",
+        )}
+      >
+        {value}
+      </dd>
+      {sub ? <dd className="text-caption text-ink-3">{sub}</dd> : null}
     </div>
   )
 }
 
-export function EmptyState({
-  icon,
+/* ── Vacíos y cargas ───────────────────────────────────────────────────── */
+
+export function Empty({
+  icon: Icon,
   title,
   children,
   action,
 }: {
-  icon?: ReactNode
+  icon: LucideIcon
   title: string
   children?: ReactNode
   action?: ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center rounded-3xl border border-dashed border-line px-6 py-10 text-center">
-      {icon ? <div className="mb-3 text-muted">{icon}</div> : null}
-      <p className="font-display text-lg font-bold">{title}</p>
-      {children ? <p className="mt-1 max-w-xs text-sm text-muted">{children}</p> : null}
-      {action ? <div className="mt-5">{action}</div> : null}
+    <div className="flex w-full flex-col items-center gap-3 px-6 py-10 text-center">
+      <span className="flex size-14 items-center justify-center rounded-full border border-line-strong text-ink-2">
+        <Icon size={26} aria-hidden />
+      </span>
+      <p className="text-[20px] leading-[26px] font-semibold tracking-[-0.01em] text-ink">{title}</p>
+      {children ? <p className="max-w-[290px] text-body text-pretty text-ink-2">{children}</p> : null}
+      {action ? <div className="mt-2">{action}</div> : null}
     </div>
   )
 }
 
-export function Segmented<T extends string>({
-  value,
-  options,
-  onChange,
-  label,
-}: {
-  value: T
-  options: { value: T; label: string }[]
-  onChange: (value: T) => void
-  label: string
-}) {
+export function Skeleton({ className }: { className?: string }) {
+  // Sin radio por defecto: quien lo usa marca la forma del contenido que sustituye.
+  return <span aria-hidden className={cx("block animate-skeleton bg-sf", className)} />
+}
+
+export function FullScreenLoader({ label = "Cargando…" }: { label?: string }) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex rounded-2xl bg-surface-2 p-1">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          role="radio"
-          aria-checked={option.value === value}
-          onClick={() => onChange(option.value)}
-          className={cx(
-            "h-9 flex-1 rounded-xl text-sm font-semibold transition",
-            option.value === value ? "bg-surface text-ink shadow-card" : "text-muted hover:text-ink",
-          )}
-        >
-          {option.label}
-        </button>
-      ))}
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6" role="status">
+      <Logo size={72} />
+      <div className="flex items-center gap-2.5 text-body-lg font-medium text-ink-2">
+        <Spinner />
+        {label}
+      </div>
     </div>
   )
 }
 
-/** Modal sobre <dialog> nativo: foco atrapado, Escape y fondo gratis. */
-export function Dialog({
-  open,
-  onClose,
-  title,
-  children,
-}: {
-  open: boolean
-  onClose: () => void
-  title: string
-  children: ReactNode
-}) {
-  const ref = useRef<HTMLDialogElement>(null)
-  const titleId = useId()
+/* ── Texto ─────────────────────────────────────────────────────────────── */
 
-  useEffect(() => {
-    const dialog = ref.current
-    if (!dialog) return
-    if (open && !dialog.open) dialog.showModal()
-    if (!open && dialog.open) dialog.close()
-  }, [open])
-
+export function ScreenTitle({ title, subtitle }: { title: ReactNode; subtitle?: ReactNode }) {
   return (
-    <dialog
-      ref={ref}
-      aria-labelledby={titleId}
-      onClose={onClose}
-      onClick={(event) => {
-        if (event.target === ref.current) onClose()
-      }}
-      className="m-auto mb-0 w-full max-w-md rounded-t-3xl border border-line bg-surface p-0 text-ink shadow-card backdrop:animate-fade-in open:animate-slide-up sm:mb-auto sm:rounded-3xl"
-    >
-      {open ? (
-        <div className="p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 id={titleId} className="font-display text-xl font-bold tracking-tight">
-              {title}
-            </h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="grid size-9 place-items-center rounded-full text-muted hover:bg-surface-2 hover:text-ink"
-              aria-label="Cerrar"
-            >
-              <X className="size-5" />
-            </button>
-          </div>
-          {children}
-        </div>
-      ) : null}
-    </dialog>
-  )
-}
-
-export function Logo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 64 64" className={className} aria-hidden>
-      <ellipse cx="32" cy="44" rx="25" ry="11" fill="#fffaf2" stroke="#e6dccd" strokeWidth="2" />
-      <path d="M9 36c0-10 10.5-17 23-17s23 7 23 17c0 4-5 6-23 6S9 40 9 36Z" fill="#ff7a52" />
-      <path
-        d="M17 26c3 3 3.5 8 2 12M27 21.5c3.5 3.5 4 10 2 16M38 21.5c3 3.5 3.5 10 1.5 16M48 26c2.5 3 3 8 1.5 12"
-        stroke="#ffd9c9"
-        strokeWidth="3"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <rect x="26" y="18" width="12" height="30" rx="3" fill="#24302a" />
-    </svg>
+    <header>
+      <h1 className="text-title text-ink lg:text-[40px] lg:leading-[46px]">{title}</h1>
+      {subtitle ? <p className="mt-1 text-body-lg text-ink-2">{subtitle}</p> : null}
+    </header>
   )
 }

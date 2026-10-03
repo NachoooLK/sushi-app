@@ -20,6 +20,7 @@ import {
 } from "firebase/firestore"
 import { displayNameOf } from "./auth"
 import { generateCode } from "./code"
+import { tableHref } from "./routes"
 import { db } from "./firebase"
 import { buildResults, computeWinners, sumPieces } from "./stats"
 import type { Player, Session } from "./types"
@@ -151,12 +152,39 @@ export async function leaveSession(uid: string, code: string) {
   await batch.commit()
 }
 
+// Toques enviados que el servidor aún no ha confirmado (sin conexión se quedan en la cola de Firestore).
+let pendingTaps = 0
+const pendingListeners = new Set<() => void>()
+
+function addPending(delta: number) {
+  pendingTaps += delta
+  pendingListeners.forEach((listener) => listener())
+}
+
+export function subscribePendingTaps(listener: () => void) {
+  pendingListeners.add(listener)
+  return () => {
+    pendingListeners.delete(listener)
+  }
+}
+
+export const getPendingTaps = () => pendingTaps
+
 /** No esperamos al servidor: la caché local pinta el cambio al instante y lo sincroniza después. */
 export function changeCount(uid: string, code: string, delta: 1 | -1) {
+  addPending(1)
   return updateDoc(playerRef(code, uid), {
     count: increment(delta),
     updatedAt: serverTimestamp(),
-  })
+  }).finally(() => addPending(-1))
+}
+
+export function subscribeMyCount(code: string, uid: string, onChange: (count: number | null) => void) {
+  return onSnapshot(
+    playerRef(code, uid),
+    (snapshot) => onChange(snapshot.exists() ? (snapshot.data().count ?? 0) : null),
+    () => onChange(null),
+  )
 }
 
 export async function finishSession(code: string, players: Player[]) {
@@ -239,5 +267,5 @@ export function isPermissionDenied(error: unknown) {
 }
 
 export function sessionUrl(code: string) {
-  return `${window.location.origin}/s/${code}`
+  return `${window.location.origin}${tableHref(code)}`
 }

@@ -15,7 +15,7 @@ export function generateCode(randomValues: (length: number) => Uint8Array = cryp
 
 /** Acepta "abc-123", " ABC 123 " o un enlace completo y devuelve el código, o null si no es válido. */
 export function normalizeCode(input: string): string | null {
-  const fromLink = input.match(/\/s\/([A-Za-z0-9-]+)/)
+  const fromLink = input.match(/\/mesa\/([A-Za-z0-9-]+)/)
   const raw = (fromLink ? fromLink[1] : input).toUpperCase().replace(/[^A-Z0-9]/g, "")
   return CODE_PATTERN.test(raw) ? raw : null
 }

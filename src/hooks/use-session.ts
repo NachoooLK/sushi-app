@@ -7,21 +7,25 @@ import type { Player, Session } from "@/lib/types"
 interface SessionData {
   session: Session | null
   players: Player[]
+  playersLoaded: boolean
   loading: boolean
-  error: string | null
+  error: boolean
+  retry: () => void
 }
 
 export function useSession(code: string | null): SessionData {
   const [session, setSession] = useState<Session | null>(null)
-  const [players, setPlayers] = useState<Player[]>([])
+  const [players, setPlayers] = useState<Player[] | null>(null)
   const [loading, setLoading] = useState(Boolean(code))
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(false)
+  const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     if (!code) return
     setLoading(true)
+    setError(false)
     const fail = () => {
-      setError("No se ha podido cargar la mesa. Revisa tu conexión.")
+      setError(true)
       setLoading(false)
     }
     const stopSession = subscribeSession(
@@ -37,9 +41,16 @@ export function useSession(code: string | null): SessionData {
       stopSession()
       stopPlayers()
     }
-  }, [code])
+  }, [code, attempt])
 
   // Sólo cuentan quienes siguen en la mesa, por si quedara algún documento huérfano.
-  const seated = session ? players.filter((player) => session.participantIds.includes(player.uid)) : []
-  return { session, players: seated, loading, error }
+  const seated = session && players ? players.filter((player) => session.participantIds.includes(player.uid)) : []
+  return {
+    session,
+    players: seated,
+    playersLoaded: players !== null,
+    loading,
+    error,
+    retry: () => setAttempt((n) => n + 1),
+  }
 }
