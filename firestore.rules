@@ -1,0 +1,168 @@
+rules_version = '2';
+
+// Sushi Rush v2
+//
+// sessions/{code}                 Una mesa: se crea en directo y el anfitrión la cierra.
+// sessions/{code}/players/{uid}   El contador de cada comensal. Sólo su dueño lo escribe,
+//                                 así dos personas sumando a la vez nunca se pisan.
+//
+// Todo lo demás (incluidas las colecciones de la v1: users, rooms, games) queda cerrado.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function me() {
+      return request.auth.uid;
+    }
+
+    function isText(value, min, max) {
+      return value is string && value.size() >= min && value.size() <= max;
+    }
+
+    function isOptionalText(value, max) {
+      return value == null || isText(value, 0, max);
+    }
+
+    match /sessions/{code} {
+      function before() {
+        return resource.data;
+      }
+
+      function after() {
+        return request.resource.data;
+      }
+
+      function changed() {
+        return after().diff(before()).affectedKeys();
+      }
+
+      function sessionFields() {
+        return ['code', 'name', 'restaurant', 'location', 'hostId', 'hostName', 'status',
+                'createdAt', 'finishedAt', 'participantIds', 'maxPlayers', 'results',
+                'totalPieces', 'winnerIds'];
+      }
+
+      function isJoin() {
+        return before().status == 'live'
+          && changed().hasOnly(['participantIds'])
+          && !(me() in before().participantIds)
+          && after().participantIds == before().participantIds.concat([me()])
+          && after().participantIds.size() <= before().maxPlayers;
+      }
+
+      function isLeave() {
+        return before().status == 'live'
+          && changed().hasOnly(['participantIds'])
+          && me() in before().participantIds
+          && me() != before().hostId
+          && after().participantIds == before().participantIds.removeAll([me()]);
+      }
+
+      function isEdit() {
+        return before().status == 'live'
+          && me() == before().hostId
+          && changed().hasOnly(['name', 'restaurant', 'location'])
+          && isText(after().name, 1, 60)
+          && isOptionalText(after().restaurant, 80)
+          && isOptionalText(after().location, 80);
+      }
+
+      function isFinish() {
+        return before().status == 'live'
+          && me() == before().hostId
+          && changed().hasOnly(['status', 'finishedAt', 'results', 'totalPieces', 'winnerIds'])
+          && after().status == 'finished'
+          && after().finishedAt == request.time
+          && after().results is list
+          && after().results.size() >= 1
+          && after().results.size() <= before().maxPlayers
+          && after().totalPieces is int
+          && after().totalPieces >= 0
+          && after().winnerIds is list
+          && after().winnerIds.size() <= after().results.size();
+      }
+
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+        && after().keys().hasOnly(sessionFields())
+        && after().keys().hasAll(sessionFields())
+        && after().code == code
+        && code.matches('^[A-HJ-NP-Z2-9]{6}$')
+        && isText(after().name, 1, 60)
+        && isOptionalText(after().restaurant, 80)
+        && isOptionalText(after().location, 80)
+        && after().hostId == me()
+        && isText(after().hostName, 1, 40)
+        && after().status == 'live'
+        && after().createdAt == request.time
+        && after().finishedAt == null
+        && after().participantIds == [me()]
+        && after().maxPlayers == 10
+        && after().results == null
+        && after().totalPieces == 0
+        && after().winnerIds == [];
+
+      allow update: if signedIn() && (isJoin() || isLeave() || isEdit() || isFinish());
+
+      allow delete: if false;
+
+      match /players/{playerId} {
+        function sessionNow() {
+          return get(/databases/$(database)/documents/sessions/$(code)).data;
+        }
+
+        function sessionAfter() {
+          return getAfter(/databases/$(database)/documents/sessions/$(code)).data;
+        }
+
+        function validRating(data) {
+          return !('rating' in data) || (data.rating is int && data.rating >= 1 && data.rating <= 5);
+        }
+
+        function validComment(data) {
+          return !('comment' in data) || isOptionalText(data.comment, 280);
+        }
+
+        allow read: if signedIn();
+
+        // Se crea en el mismo batch que añade al jugador a participantIds.
+        allow create: if signedIn()
+          && playerId == me()
+          && sessionAfter().status == 'live'
+          && me() in sessionAfter().participantIds
+          && request.resource.data.keys().hasOnly(['name', 'photoURL', 'count', 'joinedAt', 'updatedAt'])
+          && request.resource.data.keys().hasAll(['name', 'photoURL', 'count', 'joinedAt', 'updatedAt'])
+          && isText(request.resource.data.name, 1, 40)
+          && isOptionalText(request.resource.data.photoURL, 1000)
+          && request.resource.data.count == 0
+          && request.resource.data.joinedAt == request.time
+          && request.resource.data.updatedAt == request.time;
+
+        // El contador sólo se mueve mientras la mesa está en directo; la valoración
+        // también se puede dejar después de cerrarla.
+        allow update: if signedIn()
+          && playerId == me()
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['count', 'updatedAt', 'rating', 'comment'])
+          && request.resource.data.count is int
+          && request.resource.data.count >= 0
+          && request.resource.data.count <= 999
+          && (request.resource.data.count == resource.data.count || sessionNow().status == 'live')
+          && request.resource.data.updatedAt == request.time
+          && validRating(request.resource.data)
+          && validComment(request.resource.data);
+
+        // Se borra en el mismo batch que lo quita de participantIds.
+        allow delete: if signedIn()
+          && playerId == me()
+          && sessionNow().status == 'live'
+          && me() != sessionNow().hostId
+          && !(me() in sessionAfter().participantIds);
+      }
+    }
+  }
+}
